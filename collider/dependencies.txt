@@ -1,0 +1,12 @@
+Libraries need to be placed in a "libs/" directory in order for the 
+project to compile correctly. 
+
+Collider is dependent on a LibGDX jar file (see 
+http://libgdx.badlogicgames.com/download.html). This dependence is 
+minimal and may be unnecessary in a future version of Collider. 
+
+Binaries to be placed in libs/:
+ * gdx.jar
+ 
+Source code to be placed in libs/:
+ * gdx-sources.jar

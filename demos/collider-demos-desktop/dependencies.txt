@@ -1,0 +1,13 @@
+Libraries need to be placed in a "libs/" directory in order for the 
+project to compile correctly.
+
+Collider-demos-desktop is dependent on some LibGDX jar files (see 
+http://libgdx.badlogicgames.com/download.html).
+
+Binaries to be placed in libs/:
+ * gdx-backend-lwjgl.jar
+ * gdx-backend-lwjgl-natives.jar
+ * gdx-natives.jar
+ 
+Source code to be placed in libs/:
+ * gdx-backend-lwjgl-sources.jar

@@ -46,12 +46,12 @@ public class Scenarios {
 		case 0: initInstructions(); break;
 		case 1: initDanmaku1(); break;
 		case 2: initDanmaku2(); break;
-		case 3: initCoagulation(); break;
-		case 4: initPool1(); break;
-		case 5: initPool2(3); break;
-		case 6: initPool2(40); break;
-		case 7: initFractal(11); break;
-		case 8: initFractal(3); break;
+		case 3: initPool1(); break;
+		case 4: initPool2(3); break;
+		case 5: initPool2(40); break;
+		case 6: initFractal(11); break;
+		case 7: initFractal(3); break;
+		case 8: initCoagulation(); break;
 		case 9: initSpinners(); break;
 		case 10: initIndicators(); break;
 		default: throw new RuntimeException();

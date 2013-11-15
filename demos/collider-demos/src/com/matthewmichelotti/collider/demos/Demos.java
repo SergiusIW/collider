@@ -78,7 +78,7 @@ public class Demos implements ApplicationListener {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
-		Game.engine.render(false);
+		Game.engine.render(true);
 	}
 
 	@Override
