@@ -44,7 +44,6 @@
     <copy tofile="${build}/dist/NOTICE" file="../NOTICE"/>
     <zip destfile="${build}/collider-${version}.zip" basedir="${build}/dist/"/>
     <checksum file="${build}/collider-${version}.zip" algorithm="MD5" forceOverwrite="yes"/>
-    <checksum file="${build}/collider-${version}.zip" algorithm="SHA-1" forceOverwrite="yes"/>
     <checksum file="${build}/collider-${version}.zip" algorithm="SHA-512" forceOverwrite="yes"/>
   </target>
 </project>
