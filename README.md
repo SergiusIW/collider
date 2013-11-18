@@ -2,8 +2,8 @@
 
 Collider is a Java library for efficient and precise 2-D collision 
 detection with a simple interface. Collider uses [continuous collision 
-detection](http://en.wikipedia.org/wiki/Collision_detection), which 
-basically means that the time of the collision is determined very 
+detection](http://en.wikipedia.org/wiki/Collision_detection#A_posteriori_.28discrete.29_versus_a_priori_.28continuous.29),
+which basically means that the time of the collision is determined very 
 precisely as opposed to using a time-stepping method. 
 
 Links to website, release jar files, javadocs, and youtube video will be 
