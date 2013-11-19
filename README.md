@@ -9,8 +9,8 @@ precisely as opposed to using a time-stepping method.
 ###Download 
 
 The latest release build of Collider is available for download at 
-http://www.matthewmichelotti.com/projects/collider/. This distribution 
-comes with binary and source JAR files and javadocs. 
+http://www.matthewmichelotti.com/projects/collider/. This comes with 
+binary and source JAR files and javadocs. 
 
 ###Dependencies 
 
