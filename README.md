@@ -6,8 +6,11 @@ detection](http://en.wikipedia.org/wiki/Collision_detection#A_posteriori_.28disc
 which basically means that the time of the collision is determined very 
 precisely as opposed to using a time-stepping method. 
 
-Links to website, release jar files, javadocs, and youtube video will be 
-provided shortly. 
+###Download 
+
+The latest release build of Collider is available for download at 
+http://www.matthewmichelotti.com/projects/collider/. This distribution 
+comes with binary and source JAR files and javadocs. 
 
 ###Dependencies 
 
@@ -20,12 +23,19 @@ is only needed for some of its primitive data structures, so it is
 possible that this dependency may be removed at some point in the 
 future. Even so, the Collider demos will continue to depend on LibGDX. 
 
+###Documentation 
+
+Javadocs for Collider come with the distribution that you download. The 
+Javadocs for the latest release are available at 
+http://www.matthewmichelotti.com/projects/collider/api/. 
+
 ###Demos 
 
 There is currently no tutorial for using the Collider library. Along 
 with reading the javadocs, you can learn how to use Collider by studying 
-the code for the demos. These demos were used to make the youtube video. 
-The code for the demos can be found in two projects in the [github 
+the code for the demos. These demos were used to make the [youtube 
+video](http://www.youtube.com/watch?v=sFNw-wYebOc). The code for the 
+demos can be found in two projects in the [github 
 repository](https://github.com/SergiusIW/collider), demos/collider-demos 
 and demos/collider-demos-desktop. You can run these demos by importing 
 the two projects into [Eclipse](http://www.eclipse.org/), adding the 
