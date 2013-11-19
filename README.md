@@ -8,8 +8,8 @@ precisely as opposed to using a time-stepping method.
 
 ###Download 
 
-Release builds of Collider are available in the [github 
-repository](https://github.com/SergiusIW/collider).
+Release builds of Collider are available at
+https://github.com/SergiusIW/collider/releases.
 
 ###Dependencies 
 
