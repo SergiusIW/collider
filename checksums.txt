@@ -1,0 +1,7 @@
+The following are checksums for release builds of Collider
+available at http://www.matthewmichelotti.com/projects/collider/.
+
+Version 0.1.0
+-------------
+ * MD5: 24df52be393537870a9a0d1eb4db1608
+ * SHA-512: 05fc8731156ece5114ac99461cc7f3f2b48a5df2584858c835309ec1acb2cd4ec6fe9bb1d737eea0b84a85493fd2fd77e34a608f155f090fd7fc90a5010ddc36
