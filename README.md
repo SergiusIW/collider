@@ -26,7 +26,7 @@ future. Even so, the Collider demos will continue to depend on LibGDX.
 ###Documentation 
 
 Javadocs for Collider come with the distribution that you download. The 
-Javadocs for the latest release are available at 
+Javadocs for the latest release may be read online at
 http://www.matthewmichelotti.com/projects/collider/api/. 
 
 ###Demos 
