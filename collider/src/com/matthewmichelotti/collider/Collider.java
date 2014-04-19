@@ -319,7 +319,7 @@ public final class Collider {
 			b.overlapSet = overlapSetPool.remove(b.overlapSet, a);
 			if(!overlapSetPool.wasSuccessful()) throw new RuntimeException();
 			numOverlaps--;
-			if(interactTester.canInteract(a, b) && !cEvent.involves(curHitBox)) {
+			if(!cEvent.involves(curHitBox) && interactTester.canInteract(a, b)) {
 				checkForCollision(a, b);
 			}
 		}
