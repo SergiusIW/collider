@@ -136,7 +136,7 @@ public abstract class HitBox {
 		if(group < -1 || group >= NUM_GROUPS) {
 			throw new IllegalArgumentException("invalid group:" + group);
 		}
-		collider.altering(this, true);
+		collider.altering(this);
 		this.group = group;
 	}
 	

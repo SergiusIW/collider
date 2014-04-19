@@ -263,7 +263,7 @@ public final class Collider {
 		testId++;
 		if(checkReiterate) checkForReiteration();
 		int newGroup = curHitBox.getGroup();
-		if(newGroup != oldGroup && !changeInteractivity) throw new RuntimeException();
+		if(newGroup != oldGroup) changeInteractivity = true;
 		for(HitBox b : overlapSetPool.iterator(curHitBox.overlapSet)) {
 			if(!b.testMark(testId)) throw new RuntimeException();
 			if(newGroup < 0 || (changeInteractivity && !interactTester.canInteract(curHitBox, b))) {
