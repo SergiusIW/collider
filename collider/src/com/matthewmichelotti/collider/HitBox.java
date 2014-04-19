@@ -156,7 +156,6 @@ public abstract class HitBox {
 		double time = collider.getTime();
 		if(endTime <= time) throw new IllegalArgumentException("endTime already passed");
 		if(this.endTime < time) throw new RuntimeException("updating HitBox late");
-		if(this.endTime == endTime) return;
 		collider.altering(this);
 		this.endTime = endTime;
 	}
