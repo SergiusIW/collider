@@ -118,6 +118,8 @@ public abstract class HitBox {
 	 * Default group is 0.
 	 * The value -1 denotes that this HitBox does not belong to any group
 	 * and thus is never tested for collisions.
+	 * This method will also invoke the functionality of
+	 * {@link #interactivityChange()}.
 	 * <p>
 	 * Collision testing will only be performed on HitBoxes of the groups
 	 * specified by the {@link InteractTester#getInteractGroups(HitBox, com.badlogic.gdx.utils.IntArray)}
@@ -132,11 +134,10 @@ public abstract class HitBox {
 	 *   -1 and {@link #NUM_GROUPS}-1 inclusive. The value -1 denotes not belonging to any group.
 	 */
 	public final void setGroup(int group) {
-		if(this.group == group) return;
 		if(group < -1 || group >= NUM_GROUPS) {
 			throw new IllegalArgumentException("invalid group:" + group);
 		}
-		collider.altering(this);
+		collider.altering(this, true);
 		this.group = group;
 	}
 	
