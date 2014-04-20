@@ -74,7 +74,7 @@ public abstract class HitBox {
 		if(endTime < startTime) {
 			throw new RuntimeException("updating HitBox late");
 		}
-		endTime = startTime;
+		endTime = -1.0;
 		changeId++;
 	}
 	
@@ -154,8 +154,7 @@ public abstract class HitBox {
 	 */
 	public final void setEndTime(double endTime) {
 		double time = collider.getTime();
-		if(endTime <= time) throw new IllegalArgumentException("endTime already passed");
-		if(this.endTime < time) throw new RuntimeException("updating HitBox late");
+		if(endTime < time) throw new IllegalArgumentException("endTime already passed");
 		collider.altering(this);
 		this.endTime = endTime;
 	}

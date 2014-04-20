@@ -259,7 +259,7 @@ public final class Collider {
 	void processCurHBAndCollision(boolean checkReiterate) {
 		processCollision();
 		if(curHitBox == null) return;
-		if(curHitBox.endTime <= time) throw new RuntimeException("HitBox end time was not updated");
+		if(curHitBox.endTime < time) throw new RuntimeException("HitBox end time was not updated");
 		testId++;
 		if(checkReiterate) checkForReiteration();
 		int newGroup = curHitBox.getGroup();
