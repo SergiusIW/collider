@@ -56,23 +56,27 @@ public final class HBRect extends HBPositioned {
 	 * Set the width.
 	 * @param width Width.
 	 */
-	public void setWidth(double width) {collider.altering(this); this.startHW = .5*width;}
+	public void setWidth(double width) {
+		collider.altering(this);
+		this.startHW = .5*width;
+	}
 	
 	/**
 	 * Set the height.
 	 * @param height Height.
 	 */
-	public void setHeight(double height) {collider.altering(this); this.startHH = .5*height;}
+	public void setHeight(double height) {
+		collider.altering(this);
+		this.startHH = .5*height;
+	}
 	
 	/**
 	 * Set the velocity of the width.
 	 * @param velWidth Velocity of the width.
 	 */
 	public void setVelWidth(double velWidth) {
-		double velHW = .5*velWidth;
-		if(this.velHW == velHW) return;
 		collider.altering(this);
-		this.velHW = velHW;
+		this.velHW = .5*velWidth;
 	}
 	
 	/**
@@ -80,10 +84,8 @@ public final class HBRect extends HBPositioned {
 	 * @param velHeight Velocity of the height.
 	 */
 	public void setVelHeight(double velHeight) {
-		double velHH = .5*velHeight;
-		if(this.velHH == velHH) return;
 		collider.altering(this);
-		this.velHH = velHH;
+		this.velHH = .5*velHeight;
 	}
 
 	
@@ -113,11 +115,9 @@ public final class HBRect extends HBPositioned {
 	 * @param velDim Velocity of the width/height.
 	 */
 	public void setVelDims(double velDim) {
-		double velHDim = .5*velDim;
-		if(this.velHW == velHDim && this.velHH == velHDim) return;
 		collider.altering(this);
-		this.velHW = velHDim;
-		this.velHH = velHDim;
+		this.velHW = .5*velDim;
+		this.velHH = velHW;
 	}
 	
 	/**
@@ -126,12 +126,9 @@ public final class HBRect extends HBPositioned {
 	 * @param velHeight Velocity of the height.
 	 */
 	public void setVelDims(double velWidth, double velHeight) {
-		double velHW = .5*velWidth;
-		double velHH = .5*velHeight;
-		if(this.velHW == velHW && this.velHH == velHH) return;
 		collider.altering(this);
-		this.velHW = velHW;
-		this.velHH = velHH;
+		this.velHW = .5*velWidth;
+		this.velHH = .5*velHeight;
 	}
 	
 	double getHW(double time) {return startHW + (time - startTime)*velHW;}

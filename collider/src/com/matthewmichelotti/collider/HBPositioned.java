@@ -50,20 +50,25 @@ public abstract class HBPositioned extends HitBox {
 	 * Set the center x-coordinate.
 	 * @param x Center x-corrdinate.
 	 */
-	public final void setX(double x) {collider.altering(this); this.startX = x;}
+	public final void setX(double x) {
+		collider.altering(this);
+		this.startX = x;
+	}
 	
 	/**
 	 * Set the center y-coordinate.
 	 * @param y Center y-coordinate.
 	 */
-	public final void setY(double y) {collider.altering(this); this.startY = y;}
+	public final void setY(double y) {
+		collider.altering(this);
+		this.startY = y;
+	}
 	
 	/**
 	 * Set the velocity of the center x-coordinate.
 	 * @param velX Velocity of the center x-coordinate.
 	 */
 	public final void setVelX(double velX) {
-		if(this.velX == velX) return;
 		collider.altering(this);
 		this.velX = velX;
 	}
@@ -73,7 +78,6 @@ public abstract class HBPositioned extends HitBox {
 	 * @param velY Velocity of the center y-coordinate.
 	 */
 	public final void setVelY(double velY) {
-		if(this.velY == velY) return;
 		collider.altering(this);
 		this.velY = velY;
 	}
@@ -95,7 +99,6 @@ public abstract class HBPositioned extends HitBox {
 	 * @param velY Velocity of the center y-coordinate.
 	 */
 	public final void setVel(double velX, double velY) {
-		if(this.velX == velX && this.velY == velY) return;
 		collider.altering(this);
 		this.velX = velX;
 		this.velY = velY;

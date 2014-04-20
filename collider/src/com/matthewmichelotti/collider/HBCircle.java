@@ -53,17 +53,18 @@ public final class HBCircle extends HBPositioned {
 	 * Set the diameter.
 	 * @param diam Diameter.
 	 */
-	public void setDiam(double diam) {collider.altering(this); this.startRad = .5*diam;}
+	public void setDiam(double diam) {
+		collider.altering(this);
+		this.startRad = .5*diam;
+	}
 	
 	/**
 	 * Set the velocity of the diameter.
 	 * @param velDiam Velocity of the diameter.
 	 */
 	public void setVelDiam(double velDiam) {
-		double velRad = .5*velDiam;
-		if(this.velRad == velRad) return;
 		collider.altering(this);
-		this.velRad = velRad;
+		this.velRad = .5*velDiam;
 	}
 	
 	double getRad(double time) {return startRad + (time - startTime)*velRad;}
