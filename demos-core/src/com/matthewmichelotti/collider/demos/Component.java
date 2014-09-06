@@ -39,7 +39,7 @@ public abstract class Component implements Comparable<Component> {
 	protected Component(HBPositioned hitBox) {
 		if(hitBox == null) throw new IllegalArgumentException();
 		this.hitBox = hitBox;
-		hitBox.setBelongingObject(this);
+		hitBox.setOwner(this);
 		id = NEXT_ID++;
 		Game.engine.addComp(this);
 	}

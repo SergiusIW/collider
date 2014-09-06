@@ -239,8 +239,8 @@ public class GameEngine {
 			double time = collider.getTime();
 			ColliderEvent evt = collider.stepToTime(time);
 			if(evt != null) {
-				Component compA = (Component)evt.getFirst().getBelongingObject();
-				Component compB = (Component)evt.getSecond().getBelongingObject();
+				Component compA = (Component)evt.getFirst().getOwner();
+				Component compB = (Component)evt.getSecond().getOwner();
 				if(evt.isCollision()) {
 					compA.onCollide(compB);
 					if(!compA.isDeleted() && !compB.isDeleted()) compB.onCollide(compA);
@@ -269,13 +269,13 @@ public class GameEngine {
 	
 	private static class CompInteractTester implements InteractTester {
 		@Override public boolean canInteract(HitBox a, HitBox b) {
-			Component compA = (Component)a.getBelongingObject();
-			Component compB = (Component)b.getBelongingObject();
+			Component compA = (Component)a.getOwner();
+			Component compB = (Component)b.getOwner();
 			return compA.canInteract(compB) || compB.canInteract(compA);
 		}
 
 		@Override public int[] getInteractGroups(HitBox hitBox) {
-			if(((Component)hitBox.getBelongingObject()).interactsWithBullets()) return ALL_GROUPS_ARR;
+			if(((Component)hitBox.getOwner()).interactsWithBullets()) return ALL_GROUPS_ARR;
 			return NORMAL_GROUP_ARR;
 		}
 	}

@@ -16,9 +16,6 @@
 
 package com.matthewmichelotti.collider;
 
-
-//TODO rename "belongingObject" to "owner"
-//TODO replace tabs with spaces...
 //TODO rename "setEndTime" to "finalize", and require finalize to be called after all other changes to the HitBox (still requires endTime)
 
 /**
@@ -59,7 +56,7 @@ public abstract class HitBox {
 	private int group = -2;
 	private int changeId = 0;
 	private int testId = -1;
-	private Object belongingObject;
+	private Object owner;
 	
 	HitBox(Collider collider) {
 		this.collider = collider;
@@ -90,7 +87,7 @@ public abstract class HitBox {
 	 */
 	public void free() {
 		//NOTE: overridden free method should place the HitBox in the appropriate pool
-		belongingObject = null;
+		owner = null;
 		group = -2;
 	}
 	
@@ -149,7 +146,7 @@ public abstract class HitBox {
 	 * Set the expected time of the next change to the HitBox state.
 	 * This should be called every time you modify the HitBox by changing
 	 * its position, velocity, interactivity, etc. (exception: this does
-	 * not need to be called after calling {@link #setBelongingObject(Object)}).
+	 * not need to be called after calling {@link #setOwner(Object)}).
 	 * You must not wait until after the specified endTime to call
 	 * setEndTime again.  You are allowed to change the HitBox state and
 	 * reset endTime prior to the specified endTime, but this will result in more collisions
@@ -170,7 +167,7 @@ public abstract class HitBox {
 	 * a related object in a HashMap with HitBoxes as keys.
 	 * @param obj Object to be associated with this HitBox.
 	 */
-	public final void setBelongingObject(Object obj) {this.belongingObject = obj;}
+	public final void setOwner(Object obj) {this.owner = obj;}
 	
 	/**
 	 * Returns the group that this HitBox belongs to.
@@ -183,7 +180,7 @@ public abstract class HitBox {
 	 * Returns the Object associated with this HitBox.
 	 * @return The Object associated with this HitBox.
 	 */
-	public final Object getBelongingObject() {return belongingObject;}
+	public final Object getOwner() {return owner;}
 	
 	/**
 	 * Returns the current time of the simulation.
