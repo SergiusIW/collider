@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//TODO update copyright years (use IDEA's built-in support for copyright editing...)
 
 package com.matthewmichelotti.collider;
 
