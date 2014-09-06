@@ -32,7 +32,7 @@ package com.matthewmichelotti.collider;
  * Will wait for all consecutive modifier method calls on a HitBox
  * before performing this check.
  * Whenever you modify the state of a HitBox, you must also call
- * {@link #setEndTime(double)}.
+ * {@link #finalize(double)}.
  * <p>
  * For the sake of avoiding numerical instability, the dimensions
  * of a HitBox should never be zero nor extremely small.
@@ -75,7 +75,6 @@ public abstract class HitBox {
 		if(endTime < startTime) {
 			throw new RuntimeException("updating HitBox late");
 		}
-		endTime = -1.0;
 		changeId++;
 	}
 	
@@ -143,18 +142,20 @@ public abstract class HitBox {
 	}
 	
 	/**
-	 * Set the expected time of the next change to the HitBox state.
-	 * This should be called every time you modify the HitBox by changing
+	 * This should be called after you modify the HitBox by changing
 	 * its position, velocity, interactivity, etc. (exception: this does
 	 * not need to be called after calling {@link #setOwner(Object)}).
-	 * You must not wait until after the specified endTime to call
-	 * setEndTime again.  You are allowed to change the HitBox state and
-	 * reset endTime prior to the specified endTime, but this will result in more collisions
+	 * Call this method only once after you have made all of the other
+	 * changes to this HitBox.  You must specify an endTime, which
+	 * is the expected time of the next change to the HitBox state.
+	 * You must call finalize again when this endTime is reached, if not sooner.
+	 * Although you are allowed to change the HitBox state and call finalize prior
+	 * to the specified endTime, doing so will result in more collisions
 	 * that need to be tested.
 	 * @param endTime Expected time of next change to HitBox state.
 	 * Positive infinity is allowed.
 	 */
-	public final void setEndTime(double endTime) {
+	public final void finalize(double endTime) {
 		double time = collider.getTime();
 		if(endTime < time) throw new IllegalArgumentException("endTime already passed");
 		collider.altering(this);

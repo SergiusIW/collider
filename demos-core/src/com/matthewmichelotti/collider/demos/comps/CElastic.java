@@ -53,7 +53,7 @@ public class CElastic extends Component {
 		circ.setPos(x, y);
 		circ.setDiam(diam);
 		circ.setVel(2*maxVel*(.5 - Math.random()), 2*maxVel*(.5 - Math.random()));
-		circ.setEndTime(Double.POSITIVE_INFINITY);
+		circ.finalize(Double.POSITIVE_INFINITY);
 	}
 	
 	@Override public boolean canInteract(Component other) {
@@ -135,7 +135,7 @@ public class CElastic extends Component {
 		else massRatio = m2/(m1 + m2);
 		double term = 2*massRatio*normalRelVelComp;
 		circ.setVel(v1x + term*nx, v1y + term*ny);
-		circ.setEndTime(Double.POSITIVE_INFINITY);
+		circ.finalize(Double.POSITIVE_INFINITY);
 		return true;
 	}
 	

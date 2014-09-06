@@ -34,7 +34,7 @@ public class CBounds extends Component {
 		HBRect rect = rect();
 		rect.setPos(.5*GameEngine.SCREEN_WIDTH, .5*GameEngine.SCREEN_HEIGHT);
 		rect.setDims(GameEngine.SCREEN_WIDTH + 2*PAD, GameEngine.SCREEN_HEIGHT + 2*PAD);
-		rect.setEndTime(Double.POSITIVE_INFINITY);
+		rect.finalize(Double.POSITIVE_INFINITY);
 	}
 
 	@Override public void onCollide(Component other) {}

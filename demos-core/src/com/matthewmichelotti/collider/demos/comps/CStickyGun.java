@@ -39,7 +39,7 @@ public class CStickyGun extends Component {
 		circ.setDiam(CEnemyShip.DIAM);
 		circ.setPos(x, y);
 		circ.setGroup(-1);
-		circ.setEndTime(Double.POSITIVE_INFINITY);
+		circ.finalize(Double.POSITIVE_INFINITY);
 		
 		final double vel = BASE_VEL/shotDiam;
 		final double period = 1.5*shotDiam/vel;

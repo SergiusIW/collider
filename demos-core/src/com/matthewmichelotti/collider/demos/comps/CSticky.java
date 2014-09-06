@@ -37,7 +37,7 @@ public class CSticky extends Component {
 		circ.setPos(pos.x, pos.y);
 		circ.setVel(pos.vx, pos.vy);
 		circ.setDiam(diam);
-		circ.setEndTime(Double.POSITIVE_INFINITY);
+		circ.finalize(Double.POSITIVE_INFINITY);
 		if(!isInBounds()) throw new RuntimeException();
 	}
 
@@ -57,7 +57,7 @@ public class CSticky extends Component {
 		}
 		else {
 			hitBox().setVel(0.0, 0.0);
-			hitBox().setEndTime(Double.POSITIVE_INFINITY);
+			hitBox().finalize(Double.POSITIVE_INFINITY);
 		}
 		if(other instanceof CTarget) ((CTarget)other).hit();
 	}

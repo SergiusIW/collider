@@ -54,7 +54,7 @@ public class CWaveBullet extends Component {
 				hitBox.setX(startX + baseVX*timeDiff + value*perpUX);
 				hitBox.setY(startY + baseVY*timeDiff + value*perpUY);
 				hitBox.setVel(baseVX + vel*perpUX, baseVY + vel*perpUY);
-				hitBox.setEndTime(endTime);
+				hitBox.finalize(endTime);
 			}
 		};
 		if(!isInBounds()) throw new RuntimeException();

@@ -41,7 +41,7 @@ public class CBullet extends Component {
 		circ.setVel(pos.vx, pos.vy);
 		circ.setDiam(DIAM);
 		circ.setGroup(GameEngine.GROUP_BULLET);
-		circ.setEndTime(Double.POSITIVE_INFINITY);
+		circ.finalize(Double.POSITIVE_INFINITY);
 		if(!isInBounds()) throw new RuntimeException();
 	}
 

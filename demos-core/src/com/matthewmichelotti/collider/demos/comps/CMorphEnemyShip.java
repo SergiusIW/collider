@@ -34,7 +34,7 @@ public class CMorphEnemyShip extends CTarget {
 		HBCircle circ = circ();
 		circ.setDiam(CEnemyShip.DIAM);
 		circ.setPos(x, y);
-		circ.setEndTime(Double.POSITIVE_INFINITY);
+		circ.finalize(Double.POSITIVE_INFINITY);
 		
 		final int numPoints = 30;
 		final double offset = .5*(CEnemyShip.DIAM + CMorphBullet.DIAM);

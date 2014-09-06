@@ -38,10 +38,10 @@ final class EReiterate extends FunctionEvent {
 		if(changeId == hitBox.getChangeId()) {
 			double stepEndTime = collider.getTime() + period;
 			if(endTime <= stepEndTime) {
-				hitBox.setEndTime(endTime);
+				hitBox.finalize(endTime);
 			}
 			else {
-				hitBox.setEndTime(stepEndTime);
+				hitBox.finalize(stepEndTime);
 				collider.processCurHBAndCollision(false);
 				changeId = hitBox.getChangeId();
 				time = stepEndTime;

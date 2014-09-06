@@ -227,6 +227,7 @@ public final class Collider {
 	
 	void altering(HitBox hitBox, boolean changeInteractivity) {
 		if(!hitBox.isInitialized()) throw new RuntimeException("cannot alter hitBox after freed");
+		curHitBox.endTime = -1;
 		if(curHitBox == hitBox) {
 			if(changeInteractivity) this.changeInteractivity = true;
 			return;
@@ -254,7 +255,7 @@ public final class Collider {
 	void processCurHBAndCollision(boolean checkReiterate) {
 		processCollision();
 		if(curHitBox == null) return;
-		if(curHitBox.endTime < time) throw new RuntimeException("HitBox end time was not updated");
+		if(curHitBox.endTime < time) throw new RuntimeException("HitBox was not finalized after being altered");
 		testId++;
 		if(checkReiterate) checkForReiteration();
 		int newGroup = curHitBox.getGroup();

@@ -42,7 +42,7 @@ public class CMorphBullet extends Component {
 			@Override protected void update(double value, double vel, double endTime) {
 				circ.setDiam(value);
 				circ.setVelDiam(vel);
-				circ.setEndTime(endTime);
+				circ.finalize(endTime);
 			}
 		};
 		if(!isInBounds()) throw new RuntimeException();

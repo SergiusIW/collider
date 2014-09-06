@@ -36,13 +36,13 @@ public class CMorphSticky extends Component {
 		final HBCircle circ = circ();
 		circ.setPos(pos.x, pos.y);
 		circ.setVel(pos.vx, pos.vy);
-		circ.setEndTime(Double.POSITIVE_INFINITY);
+		circ.finalize(Double.POSITIVE_INFINITY);
 		new WaveUpdater(CMorphBullet.DIAM, -34, 1) {
 			@Override protected boolean isValid() {return !isDeleted() && stuckTime < 0.0;}
 			@Override protected void update(double value, double vel, double endTime) {
 				circ.setDiam(value);
 				circ.setVelDiam(vel);
-				circ.setEndTime(endTime);
+				circ.finalize(endTime);
 			}
 		};
 		if(!isInBounds()) throw new RuntimeException();
@@ -65,7 +65,7 @@ public class CMorphSticky extends Component {
 		else {
 			hitBox().setVel(0.0, 0.0);
 			circ().setVelDiam(0.0);
-			hitBox().setEndTime(Double.POSITIVE_INFINITY);
+			hitBox().finalize(Double.POSITIVE_INFINITY);
 		}
 		if(other instanceof CTarget) ((CTarget)other).hit();
 	}
