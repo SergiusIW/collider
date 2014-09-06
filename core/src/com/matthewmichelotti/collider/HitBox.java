@@ -16,8 +16,6 @@
 
 package com.matthewmichelotti.collider;
 
-//TODO rename "setEndTime" to "finalize", and require finalize to be called after all other changes to the HitBox (still requires endTime)
-
 /**
  * Description of position, shape, and velocities of a hitbox
  * used for testing collision with other HitBoxes.
@@ -32,7 +30,7 @@ package com.matthewmichelotti.collider;
  * Will wait for all consecutive modifier method calls on a HitBox
  * before performing this check.
  * Whenever you modify the state of a HitBox, you must also call
- * {@link #finalize(double)}.
+ * {@link #commit(double)}.
  * <p>
  * For the sake of avoiding numerical instability, the dimensions
  * of a HitBox should never be zero nor extremely small.
@@ -149,14 +147,14 @@ public abstract class HitBox {
 	 * Call this method only once after you have made all of the other
 	 * changes to this HitBox.  You must specify an endTime, which
 	 * is the expected time of the next change to the HitBox state.
-	 * You must call finalize again when this endTime is reached, if not sooner.
-	 * Although you are allowed to change the HitBox state and call finalize prior
+	 * You must call commit again when this endTime is reached, if not sooner.
+	 * Although you are allowed to change the HitBox state and call commit prior
 	 * to the specified endTime, doing so will result in more collisions
 	 * that need to be tested.
 	 * @param endTime Expected time of next change to HitBox state.
 	 * Positive infinity is allowed.
 	 */
-	public final void finalize(double endTime) {
+	public final void commit(double endTime) {
 		double time = collider.getTime();
 		if(endTime < time) throw new IllegalArgumentException("endTime already passed");
 		collider.altering(this);

@@ -36,7 +36,7 @@ public class CIndicator extends Component {
 		if(isRect) rect().setDims(160.0);
 		else circ().setDiam(180.0);
 		hitBox().setPos(x, y);
-		hitBox().finalize(Double.POSITIVE_INFINITY);
+		hitBox().commit(Double.POSITIVE_INFINITY);
 	}
 
 	@Override public void onCollide(Component other) {overlaps++;}

@@ -255,7 +255,7 @@ public final class Collider {
 	void processCurHBAndCollision(boolean checkReiterate) {
 		processCollision();
 		if(curHitBox == null) return;
-		if(curHitBox.endTime < time) throw new RuntimeException("HitBox was not finalized after being altered");
+		if(curHitBox.endTime < time) throw new RuntimeException("HitBox altered but HitBox.commit was not called");
 		testId++;
 		if(checkReiterate) checkForReiteration();
 		int newGroup = curHitBox.getGroup();

@@ -39,7 +39,7 @@ public class CCoagParticle extends Component {
 		circ.setPos(x, y);
 		circ.setVel(1000*(.5 - Math.random()), 1000*(.5 - Math.random()));
 		circ.setDiam(3);
-		circ.finalize(Double.POSITIVE_INFINITY);
+		circ.commit(Double.POSITIVE_INFINITY);
 		if(!isInBounds()) throw new RuntimeException();
 	}
 	@Override public boolean canInteract(Component other) {
@@ -60,7 +60,7 @@ public class CCoagParticle extends Component {
 			circ.setVelY(circ.getVelY()*area/newArea + oCirc.getVelY()*oArea/newArea);
 			circ.setX(circ.getX()*area/newArea + oCirc.getX()*oArea/newArea);
 			circ.setY(circ.getY()*area/newArea + oCirc.getY()*oArea/newArea);
-			circ.finalize(Double.POSITIVE_INFINITY);
+			circ.commit(Double.POSITIVE_INFINITY);
 			((CCoagParticle)other).delete();
 			if(circ.getDiam() > 2*CBounds.PAD) {
 				new CCircFade(circ, COLOR, .3, null);
@@ -80,7 +80,7 @@ public class CCoagParticle extends Component {
 			else if(circ.getX() > r) circ.setX(l);
 			if(circ.getY() < b) circ.setY(t);
 			else if(circ.getY() > t) circ.setY(b);
-			circ.finalize(Double.POSITIVE_INFINITY);
+			circ.commit(Double.POSITIVE_INFINITY);
 			if(!isInBounds()) throw new RuntimeException();
 		}
 	}

@@ -51,7 +51,7 @@ public class CCircFade extends Component {
 		circ.setVelDiam(-2*vel);
 		
 		double endTime = circ.getTime() + .99*delay;
-		circ.finalize(endTime);
+		circ.commit(endTime);
 		
 		Game.engine.addEvent(new FunctionEvent(endTime) {
 			@Override public void resolve() {delete();}

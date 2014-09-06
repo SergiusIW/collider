@@ -38,7 +38,7 @@ public class CPlayerShip extends CTarget implements MousePosListener {
 	private FunctionEvent stopEvent = new FunctionEvent() {
 		@Override public void resolve() {
 			hitBox().setVel(0.0, 0.0);
-			hitBox().finalize(stopEndTime);
+			hitBox().commit(stopEndTime);
 		}
 	};
 
@@ -47,7 +47,7 @@ public class CPlayerShip extends CTarget implements MousePosListener {
 		HBCircle circ = circ();
 		circ.setDiam(10);
 		circ.setPos(.5*GameEngine.SCREEN_WIDTH, .2*GameEngine.SCREEN_HEIGHT);
-		circ.finalize(Double.POSITIVE_INFINITY);
+		circ.commit(Double.POSITIVE_INFINITY);
 		
 		Game.engine.addEvent(new FunctionEvent() {
 			@Override public void resolve() {
@@ -73,17 +73,17 @@ public class CPlayerShip extends CTarget implements MousePosListener {
 		double arriveTime = hitBox.getTime() + dmag/VEL;
 		if(arriveTime <= hitBox.getTime()) {
 			hitBox.setVel(0.0, 0.0);
-			hitBox.finalize(endTime);
+			hitBox.commit(endTime);
 			return;
 		}
 		double ux = dx/dmag;
 		double uy = dy/dmag;
 		hitBox.setVel(VEL*ux, VEL*uy);
 		if(endTime <= arriveTime) {
-			hitBox.finalize(endTime);
+			hitBox.commit(endTime);
 			return;
 		}
-		hitBox.finalize(arriveTime);
+		hitBox.commit(arriveTime);
 		this.stopEndTime = endTime;
 		stopEvent.setTime(arriveTime);
 		Game.engine.addEvent(stopEvent);

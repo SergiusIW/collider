@@ -37,7 +37,7 @@ public class CMorphStickySpinner extends Component {
 		circ.setDiam(CEnemyShip.DIAM);
 		circ.setPos(x, y);
 		circ.setGroup(-1);
-		circ.finalize(Double.POSITIVE_INFINITY);
+		circ.commit(Double.POSITIVE_INFINITY);
 		
 		final double offset = .5*(CEnemyShip.DIAM + CMorphBullet.DIAM);
 		

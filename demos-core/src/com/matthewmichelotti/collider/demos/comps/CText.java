@@ -34,7 +34,7 @@ public class CText extends Component {
 		rect.setPos(x, y);
 		rect.setDims(1);
 		rect.setGroup(-1);
-		rect.finalize(Double.POSITIVE_INFINITY);
+		rect.commit(Double.POSITIVE_INFINITY);
 		this.message = message;
 	}
 

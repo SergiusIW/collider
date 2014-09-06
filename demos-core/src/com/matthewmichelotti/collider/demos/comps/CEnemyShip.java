@@ -37,7 +37,7 @@ public class CEnemyShip extends CTarget {
 		HBCircle circ = circ();
 		circ.setDiam(DIAM);
 		circ.setPos(x, y);
-		circ.finalize(Double.POSITIVE_INFINITY);
+		circ.commit(Double.POSITIVE_INFINITY);
 		
 		final int numPoints = 170;
 		final double offset = .5*(DIAM + CBullet.DIAM);

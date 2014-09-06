@@ -119,7 +119,7 @@ public class Scenarios {
 		HBRect rect = Game.engine.makeRect();
 		rect.setPos(640, 360);
 		rect.setDims(80);
-		rect.finalize(Double.POSITIVE_INFINITY);
+		rect.commit(Double.POSITIVE_INFINITY);
 		new CTarget(rect, CPlayerShip.COLOR);
 		for(int i = 0; i < 8; i++) {
 			double angle = 2*Math.PI*i/8.0;
@@ -155,12 +155,12 @@ public class Scenarios {
 			HBRect rect = Game.engine.makeRect();
 			rect.setPos(x + 40, 20);
 			rect.setDims(80, 40);
-			rect.finalize(Double.POSITIVE_INFINITY);
+			rect.commit(Double.POSITIVE_INFINITY);
 			new CTarget(rect, color);
 			rect = Game.engine.makeRect();
 			rect.setPos(x + 40, 720 - 20);
 			rect.setDims(80, 40);
-			rect.finalize(Double.POSITIVE_INFINITY);
+			rect.commit(Double.POSITIVE_INFINITY);
 			new CTarget(rect, color);
 		}
 		
@@ -168,12 +168,12 @@ public class Scenarios {
 			HBRect rect = Game.engine.makeRect();
 			rect.setPos(20, y + 40);
 			rect.setDims(40, 80);
-			rect.finalize(Double.POSITIVE_INFINITY);
+			rect.commit(Double.POSITIVE_INFINITY);
 			new CTarget(rect, color);
 			rect = Game.engine.makeRect();
 			rect.setPos(1280 - 20, y + 40);
 			rect.setDims(40, 80);
-			rect.finalize(Double.POSITIVE_INFINITY);
+			rect.commit(Double.POSITIVE_INFINITY);
 			new CTarget(rect, color);
 		}
 	}
