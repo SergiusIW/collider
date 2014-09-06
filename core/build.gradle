@@ -3,37 +3,37 @@ sourceSets.main.java.srcDirs = [ "src/", "src_gdx_util/" ]
 //TODO upload Jars to maven...
 
 ext {
-    projectBaseName = "collider"
+	projectBaseName = "collider"
 }
 
 jar {
-    baseName = projectBaseName
+	baseName = projectBaseName
 }
 
 task apiDocs(type: Javadoc) {
-    source = sourceSets.main.allJava
-    options.addStringOption "bottom", "Copyright &copy; 2013-2014 Matthew D. Michelotti"
-    options.setWindowTitle "Collider $version API"
+	source = sourceSets.main.allJava
+	options.addStringOption "bottom", "Copyright &copy; 2013-2014 Matthew D. Michelotti"
+	options.setWindowTitle "Collider $version API"
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-    baseName = projectBaseName
+	classifier = 'sources'
+	from sourceSets.main.allSource
+	baseName = projectBaseName
 }
 
 task javadocJar(type: Jar, dependsOn: apiDocs) {
-    classifier = 'javadoc'
-    from apiDocs.destinationDir
-    baseName = projectBaseName
+	classifier = 'javadoc'
+	from apiDocs.destinationDir
+	baseName = projectBaseName
 }
 
 task distAsZip(type: Zip, dependsOn: [jar, apiDocs, sourcesJar]) {
-    from sourcesJar.archivePath, jar.archivePath, "../LICENSE"
-    from(apiDocs.destinationDir) {
-        into "doc"
-    }
-    baseName = projectBaseName
+	from sourcesJar.archivePath, jar.archivePath, "../LICENSE"
+	from(apiDocs.destinationDir) {
+		into "doc"
+	}
+	baseName = projectBaseName
 }
 
 

@@ -186,10 +186,10 @@ final class SetPool <T> {
 		else {
 			Object[] arr = arrayPool.obtain();
 			int i = 0;
-            for(Object o : set) {
-                arr[i] = o;
-                i++;
-            }
+			for(Object o : set) {
+				arr[i] = o;
+				i++;
+			}
 			result = arr;
 		}
 		set.clear(setInitCap);

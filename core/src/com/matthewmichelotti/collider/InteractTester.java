@@ -32,9 +32,9 @@ public interface InteractTester {
 	 * is called after
 	 * <ul>
 	 * <li>{@link HitBox#interactivityChange()}
-     *     is called on one of the involved HitBoxes,
+	 *     is called on one of the involved HitBoxes,
 	 * <li>The group of one of the involved HitBoxes is changed by calling
-     *     {@link HitBox#setGroup(int)},
+	 *     {@link HitBox#setGroup(int)},
 	 * <li>A collision/separation event occurs for this pair of HitBoxes.
 	 * </ul>
 	 * @param a First HitBox.
@@ -49,13 +49,13 @@ public interface InteractTester {
 	 * Do not need to list groups in order, but there should be no duplicates.
 	 * If this method does not list a certain group as interactable with
 	 * a certain HitBox, then {@link #canInteract(HitBox,
-     * HitBox)} must return false
+	 * HitBox)} must return false
 	 * when comparing that HitBox with any HitBox of the given group.
 	 * @param hitBox HitBox to test interactivity of.
-     * @return an array of groups that can be interacted with.  For efficiency, this
-     * array should not be constructed each time the method is called.
-     * This array will not be modified.
-     * Returning null will be treated the same as returning an empty array
+	 * @return an array of groups that can be interacted with.  For efficiency, this
+	 * array should not be constructed each time the method is called.
+	 * This array will not be modified.
+	 * Returning null will be treated the same as returning an empty array
 	 * @see HitBox#setGroup(int)
 	 */
 	public int[] getInteractGroups(HitBox hitBox);

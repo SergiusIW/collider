@@ -51,10 +51,10 @@ public class GameEngine {
 	public final static int GROUP_NORMAL = 0;
 	public final static int GROUP_BULLET = 1;
 
-    private final static int[] ALL_GROUPS_ARR = new int[] {GROUP_NORMAL, GROUP_BULLET};
-    private final static int[] NORMAL_GROUP_ARR = new int[] {GROUP_NORMAL};
+	private final static int[] ALL_GROUPS_ARR = new int[] {GROUP_NORMAL, GROUP_BULLET};
+	private final static int[] NORMAL_GROUP_ARR = new int[] {GROUP_NORMAL};
 
-    private Processes processes;
+	private Processes processes;
 	private Collider collider;
 	private HashSet<Component> comps = new HashSet<Component>();
 	private PriorityQueue<FunctionEvent> events = new PriorityQueue<FunctionEvent>();
@@ -275,8 +275,8 @@ public class GameEngine {
 		}
 
 		@Override public int[] getInteractGroups(HitBox hitBox) {
-            if(((Component)hitBox.getBelongingObject()).interactsWithBullets()) return ALL_GROUPS_ARR;
-            return NORMAL_GROUP_ARR;
+			if(((Component)hitBox.getBelongingObject()).interactsWithBullets()) return ALL_GROUPS_ARR;
+			return NORMAL_GROUP_ARR;
 		}
 	}
 }

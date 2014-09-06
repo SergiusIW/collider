@@ -279,16 +279,16 @@ public final class Collider {
 		field.getIndexBounds(curHitBox, newBounds);
 		if(oldGroup == newGroup) field.remove(curHitBox, oldGroup, oldBounds, newBounds);
 		else field.remove(curHitBox, oldGroup, oldBounds, null);
-        int[] groupArr = null;
+		int[] groupArr = null;
 		if(newGroup >= 0) groupArr = interactTester.getInteractGroups(curHitBox);
 		curHitBox.testMark(testId);
-        if(groupArr != null && groupArr.length > 0) {
-            for (HitBox b : field.iterator(newBounds, groupArr, testId)) {
-                if (interactTester.canInteract(curHitBox, b)) {
-                    checkForCollision(curHitBox, b);
-                }
-            }
-        }
+		if(groupArr != null && groupArr.length > 0) {
+			for (HitBox b : field.iterator(newBounds, groupArr, testId)) {
+				if (interactTester.canInteract(curHitBox, b)) {
+					checkForCollision(curHitBox, b);
+				}
+			}
+		}
 		if(oldGroup == newGroup) field.add(curHitBox, newGroup, oldBounds, newBounds);
 		else field.add(curHitBox, newGroup, null, newBounds);
 		curHitBox = null;
