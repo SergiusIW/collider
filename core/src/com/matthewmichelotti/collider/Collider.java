@@ -227,8 +227,8 @@ public final class Collider {
 	
 	void altering(HitBox hitBox, boolean changeInteractivity) {
 		if(!hitBox.isInitialized()) throw new RuntimeException("cannot alter hitBox after freed");
-		curHitBox.endTime = -1;
 		if(curHitBox == hitBox) {
+			hitBox.endTime = -1;
 			if(changeInteractivity) this.changeInteractivity = true;
 			return;
 		}

@@ -76,6 +76,7 @@ public abstract class HitBox {
 			throw new RuntimeException("updating HitBox late");
 		}
 		changeId++;
+		endTime = -1;
 	}
 	
 	/**
