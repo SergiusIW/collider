@@ -31,8 +31,6 @@ import java.util.PriorityQueue;
  * @author Matthew Michelotti
  */
 
-//TODO check for Java warnings
-
 public final class Collider {
 	private Field field;
 	private double time = 0.0;

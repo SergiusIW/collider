@@ -12,8 +12,10 @@ jar {
 
 task apiDocs(type: Javadoc) {
 	source = sourceSets.main.allJava
-	options.addStringOption "bottom", "Copyright &copy; 2013-2014 Matthew D. Michelotti"
+	//options.addStringOption "bottom", "Copyright &copy; 2013-2014 Matthew D. Michelotti"
 	options.setWindowTitle "Collider $version API"
+	options.setBottom "Copyright &copy; 2013-2014 Matthew D. Michelotti"
+	options.setDocTitle "Collider $version API"
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

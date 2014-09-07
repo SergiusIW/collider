@@ -54,6 +54,8 @@ import java.util.NoSuchElementException;
  * hash collisions. Load factors greater than 0.91 greatly increase the chances the set will have to rehash to the next higher POT
  * size.
  * @author Nathan Sweet */
+//MM: added suppress warnings unchecked, unused
+@SuppressWarnings({"unchecked", "unused"})
 //MM: changed class from public to package-private
 class ObjectSet<T> implements Iterable<T> {
 	private static final int PRIME1 = 0xbe1f14b1;

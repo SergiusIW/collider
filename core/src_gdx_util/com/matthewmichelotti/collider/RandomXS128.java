@@ -172,7 +172,7 @@ class RandomXS128 extends Random {
 	 * This implementation uses {@link #nextLong()} internally. */
 	@Override
 	public void nextBytes (final byte[] bytes) {
-		int n = 0;
+		int n; // = 0; //MM: commented this assignment
 		int i = bytes.length;
 		while (i != 0) {
 			n = i < 8 ? i : 8; // min(i, 8);

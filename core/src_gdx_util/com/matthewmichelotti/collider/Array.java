@@ -53,6 +53,8 @@ import java.util.NoSuchElementException;
 /** A resizable, ordered or unordered array of objects. If unordered, this class avoids a memory copy when removing elements (the
  * last element is moved to the removed element's position).
  * @author Nathan Sweet */
+//MM: added suppress warnings unchecked, unused
+@SuppressWarnings({"unchecked", "unused"})
 //MM: changed class from public to package-private
 class Array<T> implements Iterable<T> {
 	/** Provides direct access to the underlying array. If the Array's generic type is not Object, this field may only be accessed
