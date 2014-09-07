@@ -4,23 +4,13 @@ Collider is a Java library for efficient and precise 2-D collision
 detection with a simple interface. Collider uses [continuous collision 
 detection](http://en.wikipedia.org/wiki/Collision_detection#A_posteriori_.28discrete.29_versus_a_priori_.28continuous.29),
 which basically means that the time of the collision is determined very 
-precisely as opposed to using a time-stepping method. 
+precisely as opposed to using a time-stepping method.
 
 ###Download 
 
 Release builds of Collider are available at
 https://github.com/SergiusIW/collider/releases.
-
-###Dependencies 
-
-The collider, demos/collider-demos, and demos/collider-demos-desktop 
-projects each contain a file named "dependencies.txt" that describes 
-which jar libraries are necessary for compilation. 
-
-Collider depends on [LibGDX](http://libgdx.badlogicgames.com/). LibGDX 
-is only needed for some of its primitive data structures, so it is 
-possible that this dependency may be removed at some point in the 
-future. Even so, the Collider demos will continue to depend on LibGDX. 
+At some point in the future I will start uploading release builds to Maven Central.
 
 ###Documentation 
 
@@ -39,9 +29,22 @@ repository](https://github.com/SergiusIW/collider), demos/collider-demos
 and demos/collider-demos-desktop. You can run these demos by importing 
 the two projects into [Eclipse](http://www.eclipse.org/), adding the 
 necessary libraries described in the dependencies.txt files, and running 
-the main method in the collider-demos-desktop project. 
+the main method in the collider-demos-desktop project.
+
+###Dependencies
+
+The Collider library does not depend on any third party libraries.
+However, the Collider demos depend on [LibGDX](http://libgdx.badlogicgames.com/).
+Building with Gradle will download these dependencies for you.
+See the build.gradle files for more details.
 
 ### License 
 
 Collider is licensed under the [Apache 2.0 
 License](http://www.apache.org/licenses/LICENSE-2.0.html). 
+
+### Example Game
+
+I've made a game called [Weaponless](http://www.matthewmichelotti.com/games/weaponless/)
+that uses this library to handle collision detection.
+Check it out at http://www.matthewmichelotti.com/games/weaponless/.
