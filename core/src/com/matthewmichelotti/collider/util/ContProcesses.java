@@ -59,7 +59,8 @@ public class ContProcesses {
 	}
 
 	/**
-	 * @return The current time of the processes.
+	 * Returns the current time of the processes.
+	 * @return The current time.
 	 */
 	public double getTime() {
 		return time;

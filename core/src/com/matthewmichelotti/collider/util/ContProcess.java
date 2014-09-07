@@ -25,8 +25,9 @@ package com.matthewmichelotti.collider.util;
  */
 public interface ContProcess {
 	/**
-	 * @return The time that the next event will occur in this process
-	 * assuming no other processes have an event before that time.
+	 * Returns the time that the next event will occur in this process.
+	 * Assumes no other processes have an event before that time.
+	 * @return The time of the next event.
 	 */
 	public double peekNextEventTime();
 
