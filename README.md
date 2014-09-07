@@ -16,7 +16,12 @@ At some point in the future I will start uploading release builds to Maven Centr
 
 Javadocs for Collider come with the distribution that you download. The 
 Javadocs for the latest release may be read online at
-http://www.matthewmichelotti.com/projects/collider/api/. 
+http://www.matthewmichelotti.com/projects/collider/api/.
+
+###Source Code
+
+This project is open-source and available on GitHub.
+You can find the source code at https://github.com/SergiusIW/collider.
 
 ###Demos 
 
