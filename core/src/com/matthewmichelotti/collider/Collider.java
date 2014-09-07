@@ -31,6 +31,8 @@ import java.util.PriorityQueue;
  * @author Matthew Michelotti
  */
 
+//TODO check for Java warnings
+
 public final class Collider {
 	private Field field;
 	private double time = 0.0;
@@ -164,6 +166,7 @@ public final class Collider {
 	 * event, because it may just process an internal event.
 	 * @return Time of next event in priority queue, or positive infinity if
 	 *   there are no events.
+	 * @see com.matthewmichelotti.collider.util.ContProcess
 	 */
 	public double peekNextEventTime() {
 		processCurHBAndCollision();

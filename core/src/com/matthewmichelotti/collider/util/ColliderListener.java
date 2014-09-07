@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.matthewmichelotti.collider.demos;
+package com.matthewmichelotti.collider.util;
+
+import com.matthewmichelotti.collider.ColliderEvent;
 
 /**
- * A continuous-time process. This is used to wrap arround Collider
- * as well as to handle FunctionEvents.
+ * Created by Matthew Michelotti on 9/6/2014.
+ *
  * @author Matthew Michelotti
  */
-public interface Process {
-	public double peekNextEventTime();
-	public void stepToTime(double time);
-	public void resolveEvent();
+public interface ColliderListener {
+	public void collision(ColliderEvent evt);
+	public void separation(ColliderEvent evt);
 }

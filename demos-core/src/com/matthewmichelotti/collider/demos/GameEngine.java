@@ -38,6 +38,10 @@ import com.matthewmichelotti.collider.HBRect;
 import com.matthewmichelotti.collider.HitBox;
 import com.matthewmichelotti.collider.InteractTester;
 import com.matthewmichelotti.collider.demos.comps.CBounds;
+import com.matthewmichelotti.collider.util.ColliderListener;
+import com.matthewmichelotti.collider.util.ColliderProcess;
+import com.matthewmichelotti.collider.util.ContProcesses;
+import com.matthewmichelotti.collider.util.ContProcess;
 
 /**
  * Manages FunctionEvents, ColliderEvents,
@@ -54,7 +58,7 @@ public class GameEngine {
 	private final static int[] ALL_GROUPS_ARR = new int[] {GROUP_NORMAL, GROUP_BULLET};
 	private final static int[] NORMAL_GROUP_ARR = new int[] {GROUP_NORMAL};
 
-	private Processes processes;
+	private ContProcesses processes;
 	private Collider collider;
 	private HashSet<Component> comps = new HashSet<Component>();
 	private PriorityQueue<FunctionEvent> events = new PriorityQueue<FunctionEvent>();
@@ -78,7 +82,7 @@ public class GameEngine {
 	}
 	
 	public void clear() {
-		processes = new Processes();
+		processes = new ContProcesses();
 		
 		ColliderOpts opts = new ColliderOpts();
 		opts.cellWidth = 22.0;
@@ -94,7 +98,7 @@ public class GameEngine {
 		
 		bgColor = Color.BLACK;
 
-		processes.addProcess(new ColliderProcess());
+		processes.addProcess(new ColliderProcess(collider, new MyColliderListener()));
 		processes.addProcess(new EventProcess());
 		events.add(new LogEvent(0.0));
 	}
@@ -226,34 +230,23 @@ public class GameEngine {
 			addEvent(this);
 		}
 	}
-	
-	private class ColliderProcess implements Process {
-		@Override public double peekNextEventTime() {
-			return collider.peekNextEventTime();
+
+	private static class MyColliderListener implements ColliderListener {
+		@Override public void collision(ColliderEvent evt) {
+			Component compA = (Component)evt.getFirst().getOwner();
+			Component compB = (Component)evt.getSecond().getOwner();
+			compA.onCollide(compB);
+			if(!compA.isDeleted() && !compB.isDeleted()) compB.onCollide(compA);
 		}
-		@Override public void stepToTime(double time) {
-			ColliderEvent evt = collider.stepToTime(time, false);
-			if(evt != null) throw new RuntimeException();
-		}
-		@Override public void resolveEvent() {
-			double time = collider.getTime();
-			ColliderEvent evt = collider.stepToTime(time);
-			if(evt != null) {
-				Component compA = (Component)evt.getFirst().getOwner();
-				Component compB = (Component)evt.getSecond().getOwner();
-				if(evt.isCollision()) {
-					compA.onCollide(compB);
-					if(!compA.isDeleted() && !compB.isDeleted()) compB.onCollide(compA);
-				}
-				else if(evt.isSeparation()) {
-					compA.onSeparate(compB);
-					if(!compA.isDeleted() && !compB.isDeleted()) compB.onSeparate(compA);
-				}
-			}
+		@Override public void separation(ColliderEvent evt) {
+			Component compA = (Component)evt.getFirst().getOwner();
+			Component compB = (Component)evt.getSecond().getOwner();
+			compA.onSeparate(compB);
+			if(!compA.isDeleted() && !compB.isDeleted()) compB.onSeparate(compA);
 		}
 	}
 	
-	private class EventProcess implements Process {
+	private class EventProcess implements ContProcess {
 		@Override public double peekNextEventTime() {
 			FunctionEvent event = events.peek();
 			if(event == null) return Double.POSITIVE_INFINITY;
@@ -262,8 +255,7 @@ public class GameEngine {
 		@Override public void stepToTime(double time) {}
 		@Override public void resolveEvent() {
 			FunctionEvent event = events.poll();
-			if(event.getTime() != processes.getTime()) throw new RuntimeException();
-			event.resolve();
+			if(event.getTime() == processes.getTime()) event.resolve();
 		}
 	}
 	
