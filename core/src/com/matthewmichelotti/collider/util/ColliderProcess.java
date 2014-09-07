@@ -21,7 +21,7 @@ import com.matthewmichelotti.collider.ColliderEvent;
 import com.matthewmichelotti.collider.ColliderOpts;
 
 /**
- *
+ * A ContProcess implementation wrapped around a Collider.
  *
  * @author Matthew Michelotti
  */
@@ -29,14 +29,24 @@ public class ColliderProcess implements ContProcess {
 	private Collider collider;
 	private ColliderListener listener;
 
-	public ColliderProcess(ColliderOpts opts, ColliderListener listener) {
-		this(new Collider(opts), listener);
-	}
-
+	/**
+	 * Constructs a new ColliderProcess.
+	 * @param collider The underlying Collider object.
+	 * @param listener A listener to handle events from the Collider.
+	 */
 	public ColliderProcess(Collider collider, ColliderListener listener) {
 		if(collider == null || listener == null) throw new IllegalArgumentException();
 		this.collider = collider;
 		this.listener = listener;
+	}
+
+	/**
+	 * Constructs a new ColliderProcess.
+	 * @param opts A new Collider object will be constructed from these options.
+	 * @param listener A listener to handle events from the Collider.
+	 */
+	public ColliderProcess(ColliderOpts opts, ColliderListener listener) {
+		this(new Collider(opts), listener);
 	}
 
 	@Override
