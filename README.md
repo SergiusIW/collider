@@ -29,12 +29,9 @@ There is currently no tutorial for using the Collider library. Along
 with reading the javadocs, you can learn how to use Collider by studying 
 the code for the demos. These demos were used to make the [youtube 
 video](http://www.youtube.com/watch?v=sFNw-wYebOc). The code for the 
-demos can be found in two projects in the [github 
-repository](https://github.com/SergiusIW/collider), demos/collider-demos 
-and demos/collider-demos-desktop. You can run these demos by importing 
-the two projects into [Eclipse](http://www.eclipse.org/), adding the 
-necessary libraries described in the dependencies.txt files, and running 
-the main method in the collider-demos-desktop project.
+demos can be found in two modules in the [github 
+repository](https://github.com/SergiusIW/collider), demos-core
+and demos-desktop.
 
 ###Dependencies
 
