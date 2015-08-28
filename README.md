@@ -10,7 +10,7 @@ precisely as opposed to using a time-stepping method.
 
 It's been a couple of years now (August 2015) since I wrote this library.
 I like the simple public API that collider currently has, so that is unlikely to change too much.
-There a are a few plans I have for changes in the future:
+There are a few plans I have for changes in the future:
 * Better examples
 * Maven integration
 * Removing any object pooling from the public api, or at least making it an experimental option
