@@ -6,6 +6,17 @@ detection](http://en.wikipedia.org/wiki/Collision_detection#A_posteriori_.28disc
 which basically means that the time of the collision is determined very 
 precisely as opposed to using a time-stepping method.
 
+### Looking Forward
+
+It's been a couple of years now (August 2015) since I wrote this library.
+I like the simple public API that collider currently has, so that is unlikely to change too much.
+There a are a few plans I have for changes in the future:
+* Better examples
+* Maven integration
+* Removing any object pooling from the public api, or at least making it an experimental option
+* Possibly adding support for arbitrary polygons as opposed to just axis-aligned rectangles and circles, although I probably won't do this unless I have a use case for it
+* Possibly a [Rust](https://www.rust-lang.org/) port of the library, as I am very interested in this new programming language
+
 ###Download 
 
 Release builds of Collider are available at
@@ -45,8 +56,8 @@ See the build.gradle files for more details.
 Collider is licensed under the [Apache 2.0 
 License](http://www.apache.org/licenses/LICENSE-2.0.html). 
 
-### Example Game
+### Games using Collider
 
-I've made a game called [Weaponless](http://www.matthewmichelotti.com/games/weaponless/)
-that uses this library to handle collision detection.
+Currently, the only game that uses Collider is a free (closed-source) game I made named [Weaponless](http://www.matthewmichelotti.com/games/weaponless/).
 Check it out at http://www.matthewmichelotti.com/games/weaponless/.
+If you do make a project that uses Collider, I'd be happy to hear about it.
