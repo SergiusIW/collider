@@ -16,6 +16,7 @@ There are a few plans I have for changes in the future:
 * Removing any object pooling from the public api, or at least making it an experimental option
 * Possibly adding support for arbitrary polygons as opposed to just axis-aligned rectangles and circles, although I probably won't do this unless I have a use case for it
 * Possibly a [Rust](https://www.rust-lang.org/) port of the library, as I am very interested in this new programming language
+* Using builder pattern to configure Collider settings
 
 ###Download 
 
