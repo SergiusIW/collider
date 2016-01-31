@@ -600,7 +600,7 @@ class LongMap<V> implements Iterable<LongMap.Entry<V>> {
 	}
 
 	/** Returns an iterator for the entries in the map. Remove is supported. Note that the same iterator instance is returned each
-	 * time this method is called. Use the {@link com.matthewmichelotti.collider.LongMap.Entries} constructor for nested or multithreaded iteration. */
+	 * time this method is called. Use the {@link Entries} constructor for nested or multithreaded iteration. */
 	public Entries<V> entries () {
 		if (entries1 == null) {
 			entries1 = new Entries(this);
@@ -619,7 +619,7 @@ class LongMap<V> implements Iterable<LongMap.Entry<V>> {
 	}
 
 	/** Returns an iterator for the values in the map. Remove is supported. Note that the same iterator instance is returned each
-	 * time this method is called. Use the {@link com.matthewmichelotti.collider.LongMap.Entries} constructor for nested or multithreaded iteration. */
+	 * time this method is called. Use the {@link Entries} constructor for nested or multithreaded iteration. */
 	public Values<V> values () {
 		if (values1 == null) {
 			values1 = new Values(this);
@@ -638,7 +638,7 @@ class LongMap<V> implements Iterable<LongMap.Entry<V>> {
 	}
 
 	/** Returns an iterator for the keys in the map. Remove is supported. Note that the same iterator instance is returned each time
-	 * this method is called. Use the {@link com.matthewmichelotti.collider.LongMap.Entries} constructor for nested or multithreaded iteration. */
+	 * this method is called. Use the {@link Entries} constructor for nested or multithreaded iteration. */
 	public Keys keys () {
 		if (keys1 == null) {
 			keys1 = new Keys(this);

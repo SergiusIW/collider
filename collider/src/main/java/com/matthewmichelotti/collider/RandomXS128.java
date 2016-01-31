@@ -43,7 +43,7 @@ package com.matthewmichelotti.collider;
 import java.util.Random;
 
 /** This class implements the xorshift128+ algorithm that is a very fast, top-quality 64-bit pseudo-random number generator. The
- * quality of this PRNG is much higher than {@link java.util.Random}'s, and its cycle length is 2<sup>128</sup>&nbsp;&minus;&nbsp;1, which
+ * quality of this PRNG is much higher than {@link Random}'s, and its cycle length is 2<sup>128</sup>&nbsp;&minus;&nbsp;1, which
  * is more than enough for any single-thread application. More details and algorithms can be found <a
  * href="http://xorshift.di.unimi.it/">here</a>.
  * <p>
@@ -69,7 +69,7 @@ class RandomXS128 extends Random {
 	/** Creates a new random number generator. This constructor sets the seed of the random number generator to a value very likely
 	 * to be distinct from any other invocation of this constructor.
 	 * <p>
-	 * This implementation creates a {@link java.util.Random} instance to generate the initial seed. */
+	 * This implementation creates a {@link Random} instance to generate the initial seed. */
 	public RandomXS128 () {
 		setSeed(new Random().nextLong());
 	}

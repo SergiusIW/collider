@@ -58,7 +58,7 @@ import java.util.NoSuchElementException;
 //MM: changed class from public to package-private
 class Array<T> implements Iterable<T> {
 	/** Provides direct access to the underlying array. If the Array's generic type is not Object, this field may only be accessed
-	 * if the {@link com.matthewmichelotti.collider.Array#Array(boolean, int, Class)} constructor was used. */
+	 * if the {@link Array#Array(boolean, int, Class)} constructor was used. */
 	public T[] items;
 
 	public int size;
@@ -433,7 +433,7 @@ class Array<T> implements Iterable<T> {
 	}
 
 	/** Returns an iterator for the items in the array. Remove is supported. Note that the same iterator instance is returned each
-	 * time this method is called. Use the {@link com.matthewmichelotti.collider.Array.ArrayIterator} constructor for nested or multithreaded iteration. */
+	 * time this method is called. Use the {@link ArrayIterator} constructor for nested or multithreaded iteration. */
 	public Iterator<T> iterator () {
 		if (iterable == null) iterable = new ArrayIterable(this);
 		return iterable.iterator();
