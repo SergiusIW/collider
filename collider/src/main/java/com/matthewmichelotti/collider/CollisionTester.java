@@ -18,10 +18,10 @@ package com.matthewmichelotti.collider;
 
 final class CollisionTester {
 	private double separateBuffer;
-	private HBRect dummyRect = new HBRect(null);
-	private HBCircle dummyPoint = new HBCircle(null);
-	private HBRect dummyRect2 = new HBRect(null);
-	private HBCircle dummyCircle = new HBCircle(null);
+	private HBRect dummyRect = new HBRect();
+	private HBCircle dummyPoint = new HBCircle();
+	private HBRect dummyRect2 = new HBRect();
+	private HBCircle dummyCircle = new HBCircle();
 	private Normal normal = new Normal();
 	
 	CollisionTester(ColliderOpts opts) {

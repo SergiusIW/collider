@@ -24,16 +24,13 @@ package com.matthewmichelotti.collider;
 public final class HBCircle extends HBPositioned {
 	double startRad;
 	double velRad;
+
+	HBCircle() {
+		super();
+	}
 	
 	HBCircle(Collider collider) {
 		super(collider);
-	}
-
-	@Override
-	void init() {
-		super.init();
-		this.startRad = 0.0;
-		this.velRad = 0.0;
 	}
 
 	@Override

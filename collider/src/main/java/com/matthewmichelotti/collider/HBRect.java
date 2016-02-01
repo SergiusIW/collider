@@ -24,18 +24,13 @@ package com.matthewmichelotti.collider;
 public final class HBRect extends HBPositioned {
 	double startHW, startHH;
 	double velHW, velHH;
+
+	HBRect() {
+		super();
+	}
 	
 	HBRect(Collider collider) {
 		super(collider);
-	}
-
-	@Override
-	void init() {
-		super.init();
-		this.startHW = 0.0;
-		this.startHH = 0.0;
-		this.velHW = 0.0;
-		this.velHH = 0.0;
 	}
 
 	@Override

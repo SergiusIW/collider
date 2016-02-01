@@ -59,19 +59,6 @@ public final class Collider {
 	private int hitBoxesInUse = 0;
 	private int numOverlaps = 0;
 
-	private HitBoxPool<HBRect> rectPool = new HitBoxPool<HBRect>() {
-		@Override protected HBRect newObject() {return new HBRect(Collider.this);}
-	};
-	private HitBoxPool<HBCircle> circlePool = new HitBoxPool<HBCircle>() {
-		@Override protected HBCircle newObject() {return new HBCircle(Collider.this);}
-	};
-	private Pool<EReiterate> reiteratePool = new Pool<EReiterate>() {
-		@Override protected EReiterate newObject() {return new EReiterate();}
-	};
-	private Pool<ECollide> collidePool = new Pool<ECollide>() {
-		@Override protected ECollide newObject() {return new ECollide();}
-	};
-
 	private SetPool<HitBox> overlapSetPool = new SetPool<>();
 	
 	/**
@@ -89,22 +76,18 @@ public final class Collider {
 	
 	/**
 	 * Obtains a rectangular HitBox to be used with this Collider.
-	 * @return A free HBRect obtained from a pool.
+	 * @return a new HBRect
 	 */
 	public HBRect makeRect() {
-		HBRect hitBox = rectPool.obtain();
-		hitBox.init();
-		return hitBox;
+		return new HBRect(this);
 	}
 	
 	/**
 	 * Obtains a circular HitBox to be used with this Collider.
-	 * @return A free HBCircle obtained from a pool.
+	 * @return a new HBCircle
 	 */
 	public HBCircle makeCircle() {
-		HBCircle hitBox = circlePool.obtain();
-		hitBox.init();
-		return hitBox;
+		return new HBCircle(this);
 	}
 	
 	/**
@@ -199,15 +182,13 @@ public final class Collider {
 	Normal getNormal(HitBox source, HitBox dest) {
 		return collisionTester.normal(source, dest, time);
 	}
-	
+
 	void free(HBRect hitBox) {
 		removeHitBoxReferences(hitBox);
-		rectPool.free(hitBox);
 	}
 	
 	void free(HBCircle hitBox) {
 		removeHitBoxReferences(hitBox);
-		circlePool.free(hitBox);
 	}
 	
 	private void removeHitBoxReferences(HitBox hitBox) {
@@ -250,8 +231,6 @@ public final class Collider {
 		nextEventId++;
 		queue.add(event);
 	}
-	void freeEvent(EReiterate evt) {reiteratePool.free(evt);}
-	void freeEvent(ECollide evt) {collidePool.free(evt);}
 
 	void processCurHBAndCollision() {
 		processCurHBAndCollision(true);
@@ -339,8 +318,7 @@ public final class Collider {
 		if(period > maxForesightTime) period = maxForesightTime;
 		double firstReiterTime = time + period;
 		if(firstReiterTime >= curHitBox.endTime) return;
-		EReiterate event = reiteratePool.obtain();
-		event.init(curHitBox, firstReiterTime, curHitBox.endTime, period);
+		EReiterate event = new EReiterate(curHitBox, firstReiterTime, curHitBox.endTime, period);
 		curHitBox.endTime = firstReiterTime;
 		queue(event);
 	}
@@ -348,18 +326,14 @@ public final class Collider {
 	private void checkForCollision(HitBox a, HitBox b) {
 		double collideTime = collisionTester.collideTime(a, b, time);
 		if(collideTime < Double.POSITIVE_INFINITY) {
-			ECollide event = collidePool.obtain();
-			event.init(a, b, collideTime, true);
-			queue(event);
+			queue(new ECollide(a, b, collideTime, true));
 		}
 	}
 	
 	private void checkForSeparation(HitBox a, HitBox b) {
 		double collideTime = collisionTester.separateTime(a, b, time);
 		if(collideTime < Double.POSITIVE_INFINITY) {
-			ECollide event = collidePool.obtain();
-			event.init(a, b, collideTime, false);
-			queue(event);
+			queue(new ECollide(a, b, collideTime, false));
 		}
 	}
 	

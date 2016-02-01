@@ -55,15 +55,16 @@ public abstract class HitBox {
 	private int changeId = 0;
 	private int testId = -1;
 	private Object owner;
+
+	HitBox() {
+		this.collider = null;
+	}
 	
 	HitBox(Collider collider) {
 		this.collider = collider;
-	}
-	
-	void init() {
 		this.startTime = collider.getTime();
 		this.endTime = this.startTime;
-		
+
 		this.group = -1;
 		setGroup(0);
 	}

@@ -24,18 +24,13 @@ package com.matthewmichelotti.collider;
 public abstract class HBPositioned extends HitBox {
 	double startX, startY;
 	double velX, velY;
+
+	HBPositioned() {
+		super();
+	}
 	
 	HBPositioned(Collider collider) {
 		super(collider);
-	}
-
-	@Override
-	void init() {
-		super.init();
-		this.startX = 0.0;
-		this.startY = 0.0;
-		this.velX = 0.0;
-		this.velY = 0.0;
 	}
 
 	@Override

@@ -17,13 +17,11 @@
 package com.matthewmichelotti.collider;
 
 final class ECollide extends FunctionEvent {
-	private HitBox a, b;
-	private int idA, idB;
-	private boolean collided;
+	private final HitBox a, b;
+	private final int idA, idB;
+	private final boolean collided;
 	
-	ECollide() {}
-	
-	void init(HitBox a, HitBox b, double time, boolean collided) {
+	ECollide(HitBox a, HitBox b, double time, boolean collided) {
 		this.a = a;
 		this.b = b;
 		this.idA = a.getChangeId();
@@ -37,8 +35,5 @@ final class ECollide extends FunctionEvent {
 		if(a.getChangeId() == idA && b.getChangeId() == idB) {
 			collider.setCollision(a, b, collided);
 		}
-		a = null;
-		b = null;
-		collider.freeEvent(this);
 	}
 }

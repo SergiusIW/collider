@@ -17,14 +17,12 @@
 package com.matthewmichelotti.collider;
 
 final class EReiterate extends FunctionEvent {
-	private HitBox hitBox;
-	private double period;
-	private double endTime;
-	private int changeId;
+	private final HitBox hitBox;
+	private final double period;
+	private final double endTime;
+	private final int changeId;
 	
-	EReiterate() {}
-	
-	void init(HitBox hitBox, double startTime, double endTime, double period) {
+	EReiterate(HitBox hitBox, double startTime, double endTime, double period) {
 		if(startTime >= endTime) throw new RuntimeException();
 		this.hitBox = hitBox;
 		this.time = startTime;
@@ -43,13 +41,8 @@ final class EReiterate extends FunctionEvent {
 			else {
 				hitBox.commit(stepEndTime);
 				collider.processCurHBAndCollision(false);
-				changeId = hitBox.getChangeId();
-				time = stepEndTime;
-				collider.queue(this);
-				return;
+				collider.queue(new EReiterate(hitBox, stepEndTime, endTime, period)); //changeId updated...
 			}
 		}
-		hitBox = null;
-		collider.freeEvent(this);
 	}
 }
