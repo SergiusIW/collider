@@ -6,10 +6,12 @@
   <artifactId>collider</artifactId>
   <version>0.1.2-SNAPSHOT</version>
   <packaging>jar</packaging>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+  
+  <parent>
+    <groupId>com.matthewmichelotti.collider</groupId>
+    <artifactId>collider-parent</artifactId>
+    <version>0.1.2-SNAPSHOT</version>
+  </parent>
 
   <dependencies>
     <dependency>
@@ -29,19 +31,10 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5</version>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.10.3</version>
         <configuration>
-          <bottom><![CDATA[Copyright &copy; 2015-2016 Matthew D. Michelotti.]]></bottom>
+          <bottom><![CDATA[Copyright &copy; 2013-2016 Matthew D. Michelotti.]]></bottom>
         </configuration>
       </plugin>
     </plugins>
