@@ -9,7 +9,7 @@
   
   <modules>
     <module>collider</module>
-    <!--<module>collider-demos</module>-->
+    <module>collider-demos</module>
   </modules>
 
   <properties>
