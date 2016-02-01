@@ -16,6 +16,9 @@
 
 package com.matthewmichelotti.collider;
 
+import com.carrotsearch.hppc.ObjectHashSet;
+import com.carrotsearch.hppc.cursors.ObjectCursor;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -25,7 +28,7 @@ final class SetPool <T> {
 	private int setInitCap;
 	
 	private Pool<Object[]> arrayPool;
-	private Pool<ObjectSet<Object>> setPool;
+	private Pool<ObjectHashSet<Object>> setPool;
 	
 	private SetIterator<T> iterator = new SetIterator<T>();
 	
@@ -52,9 +55,9 @@ final class SetPool <T> {
 			}
 		};
 		
-		setPool = new Pool<ObjectSet<Object>>() {
-			@Override protected ObjectSet<Object> newObject() {
-				return new ObjectSet<Object>(SetPool.this.setInitCap);
+		setPool = new Pool<ObjectHashSet<Object>>() {
+			@Override protected ObjectHashSet<Object> newObject() {
+				return new ObjectHashSet<Object>(SetPool.this.setInitCap);
 			}
 		};
 	}
@@ -64,7 +67,7 @@ final class SetPool <T> {
 		if(value == null) throw new IllegalArgumentException();
 		lastOpSuccess = true;
 		Class<?> valueClass = value.getClass();
-		if(valueClass == Object[].class || valueClass == ObjectSet.class) {
+		if(valueClass == Object[].class || valueClass == ObjectHashSet.class) {
 			throw new IllegalArgumentException(); 
 		}
 		if(setObj == null) return value;
@@ -82,7 +85,7 @@ final class SetPool <T> {
 				arr[size] = value;
 				return arr;
 			}
-			ObjectSet<Object> set = setPool.obtain();
+			ObjectHashSet<Object> set = setPool.obtain();
 			for(int i = 0; i < arrayCap; i++) {
 				set.add(arr[i]);
 				arr[i] = null;
@@ -91,8 +94,8 @@ final class SetPool <T> {
 			arrayPool.free(arr);
 			return set;
 		}
-		if(setObjClass == ObjectSet.class) {
-			lastOpSuccess = ((ObjectSet<Object>)setObj).add(value);
+		if(setObjClass == ObjectHashSet.class) {
+			lastOpSuccess = ((ObjectHashSet<Object>)setObj).add(value);
 			return setObj;
 		}
 		if(setObj == value) {
@@ -116,10 +119,11 @@ final class SetPool <T> {
 			}
 			arrayPool.free(arr);
 		}
-		else if(setObjClass == ObjectSet.class) {
-			ObjectSet<Object> set = (ObjectSet<Object>)setObj;
-			set.clear(setInitCap);
-			setPool.free(set);
+		else if(setObjClass == ObjectHashSet.class) {
+			//TODO rethink use of setPool
+//			ObjectHashSet<Object> set = (ObjectHashSet<Object>)setObj;
+//			set.clear(setInitCap);
+//			setPool.free(set);
 		}
 		return null;
 	}
@@ -150,8 +154,8 @@ final class SetPool <T> {
 			arr[size - 1] = null;
 			return shrinkArray(arr);
 		}
-		else if(setObjClass == ObjectSet.class) {
-			ObjectSet<Object> set = (ObjectSet<Object>)setObj;
+		else if(setObjClass == ObjectHashSet.class) {
+			ObjectHashSet<Object> set = (ObjectHashSet<Object>)setObj;
 			lastOpSuccess = set.remove(value);
 			if(!lastOpSuccess) return set;
 			return shrinkSet(set);
@@ -178,11 +182,11 @@ final class SetPool <T> {
 		return value;
 	}
 	
-	private Object shrinkSet(ObjectSet<Object> set) {
-		if(set.size > arrayReturnThreshold) return set;
+	private Object shrinkSet(ObjectHashSet<Object> set) {
+		if(set.size() > arrayReturnThreshold) return set;
 		Object result;
-		if(set.size == 0) result = null;
-		else if(set.size == 1) result = set.iterator().next();
+		if(set.size() == 0) result = null;
+		else if(set.size() == 1) result = set.iterator().next();
 		else {
 			Object[] arr = arrayPool.obtain();
 			int i = 0;
@@ -192,15 +196,15 @@ final class SetPool <T> {
 			}
 			result = arr;
 		}
-		set.clear(setInitCap);
-		setPool.free(set);
+//		set.clear(setInitCap);
+//		setPool.free(set);
 		return result;
 	}
 	
 	static class SetIterator <T> implements Iterator<T>, Iterable<T> {
 		private Object value;
 		private Object[] arr;
-		private Iterator<Object> setIter;
+		private Iterator<ObjectCursor<Object>> setIter;
 		private int index;
 		
 		SetIterator() {}
@@ -216,9 +220,9 @@ final class SetPool <T> {
 				arr = (Object[])setObj;
 				if(arr[0] == null) arr = null;
 			}
-			else if(setObjClass == ObjectSet.class) {
-				ObjectSet<Object> set = (ObjectSet<Object>)setObj;
-				if(set.size != 0) setIter = ((ObjectSet<Object>)setObj).iterator();
+			else if(setObjClass == ObjectHashSet.class) {
+				ObjectHashSet<Object> set = (ObjectHashSet<Object>)setObj;
+				if(set.size() != 0) setIter = ((ObjectHashSet<Object>)setObj).iterator();
 			}
 			else {
 				value = setObj;
@@ -255,7 +259,7 @@ final class SetPool <T> {
 				return (T)result;
 			}
 			if(setIter != null) {
-				Object result = setIter.next();
+				Object result = setIter.next().value;
 				if(!setIter.hasNext()) setIter = null;
 				return (T)result;
 			}

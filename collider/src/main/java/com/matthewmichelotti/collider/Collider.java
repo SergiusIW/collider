@@ -16,6 +16,9 @@
 
 package com.matthewmichelotti.collider;
 
+import com.carrotsearch.hppc.ObjectArrayList;
+
+import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 /**
@@ -30,7 +33,8 @@ import java.util.PriorityQueue;
  * @see HitBox
  * @author Matthew Michelotti
  */
-
+//TODO remove dependencies on copied LibGDX code, consider using HPPC dependency instead...
+//TODO consider using Apache Commons Vector2D for certain return types...
 public final class Collider {
 	private Field field;
 	private double time = 0.0;
@@ -48,13 +52,13 @@ public final class Collider {
 	private int nextEventId = 0;
 	private boolean changeInteractivity = false;
 	
-	private Array<HitBox> hitBoxRemoveBuffer = new Array<HitBox>();
+	private ArrayList<HitBox> hitBoxRemoveBuffer = new ArrayList<>();
 	
 	private int testId = 0;
 	
 	private int hitBoxesInUse = 0;
 	private int numOverlaps = 0;
-	
+
 	private HitBoxPool<HBRect> rectPool = new HitBoxPool<HBRect>() {
 		@Override protected HBRect newObject() {return new HBRect(Collider.this);}
 	};
@@ -67,8 +71,8 @@ public final class Collider {
 	private Pool<ECollide> collidePool = new Pool<ECollide>() {
 		@Override protected ECollide newObject() {return new ECollide();}
 	};
-	
-	private SetPool<HitBox> overlapSetPool = new SetPool<HitBox>();
+
+	private SetPool<HitBox> overlapSetPool = new SetPool<>();
 	
 	/**
 	 * Constructs a new Collider.

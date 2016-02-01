@@ -16,12 +16,14 @@
 
 package com.matthewmichelotti.collider;
 
+import com.carrotsearch.hppc.LongObjectHashMap;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 final class Field {
 	private SetPool<HitBox> setPool = new SetPool<HitBox>();
-	private LongMap<Object> data;
+	private LongObjectHashMap<Object> data;
 	private double cellWidth;
 	
 	private int numEntries = 0;
@@ -34,7 +36,7 @@ final class Field {
 	Field(ColliderOpts opts) {
 		if(opts.cellWidth <= 0.0) throw new IllegalArgumentException();
 		cellWidth = opts.cellWidth;
-		data = new LongMap<Object>();
+		data = new LongObjectHashMap<Object>();
 	}
 	
 	int getNumEntries() {return numEntries;}
