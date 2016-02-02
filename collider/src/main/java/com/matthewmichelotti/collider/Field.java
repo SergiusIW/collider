@@ -16,14 +16,13 @@
 
 package com.matthewmichelotti.collider;
 
-import com.carrotsearch.hppc.LongObjectHashMap;
-
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 final class Field {
 	private SetPool<HitBox> setPool = new SetPool<HitBox>();
-	private LongObjectHashMap<Object> data;
+	private HashMap<Long, Object> data;
 	private double cellWidth;
 	
 	private int numEntries = 0;
@@ -36,7 +35,7 @@ final class Field {
 	Field(ColliderOpts opts) {
 		if(opts.cellWidth <= 0.0) throw new IllegalArgumentException();
 		cellWidth = opts.cellWidth;
-		data = new LongObjectHashMap<Object>();
+		data = new HashMap<Long, Object>();
 	}
 	
 	int getNumEntries() {return numEntries;}
@@ -122,7 +121,7 @@ final class Field {
 	
 	private class HitBoxIter implements Iterator<HitBox>, Iterable<HitBox> {
 		private final IntBox.Iterator boxIter = new IntBox.Iterator();
-		private final SetPool.SetIterator<HitBox> cellIter = new SetPool.SetIterator<HitBox>();
+		private final SetPool.SetIterator<HitBox> cellIter = new SetPool.SetIterator<>();
 		private int[] groups;
 		private int groupIndex;
 		private HitBox next;

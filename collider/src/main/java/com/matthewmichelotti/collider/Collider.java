@@ -16,8 +16,6 @@
 
 package com.matthewmichelotti.collider;
 
-import com.carrotsearch.hppc.ObjectArrayList;
-
 import java.util.ArrayList;
 import java.util.PriorityQueue;
 
