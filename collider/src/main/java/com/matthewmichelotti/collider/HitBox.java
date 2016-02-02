@@ -49,7 +49,7 @@ public abstract class HitBox {
 	
 	double startTime, endTime;
 	final Collider collider;
-	Object overlapSet;
+	TightSet<HitBox> overlapSet = new TightSet<>();
 	
 	private int group = -2;
 	private int changeId = 0;

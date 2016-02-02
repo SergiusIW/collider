@@ -56,8 +56,6 @@ public final class Collider {
 	
 	private int hitBoxesInUse = 0;
 	private int numOverlaps = 0;
-
-	private SetPool<HitBox> overlapSetPool = new SetPool<>();
 	
 	/**
 	 * Constructs a new Collider.
@@ -196,12 +194,12 @@ public final class Collider {
 		}
 		altering(hitBox);
 		field.remove(hitBox, oldGroup, oldBounds, null);
-		for(HitBox b : overlapSetPool.iterator(hitBox.overlapSet)) {
-			b.overlapSet = overlapSetPool.remove(b.overlapSet, hitBox);
-			if(!overlapSetPool.wasSuccessful()) throw new RuntimeException();
+		for(HitBox b : hitBox.overlapSet) {
+			boolean success = b.overlapSet.remove(hitBox);
+			if(!success) throw new RuntimeException();
 			numOverlaps--;
 		}
-		hitBox.overlapSet = overlapSetPool.clear(hitBox.overlapSet);
+		hitBox.overlapSet.clear();
 		curHitBox = null;
 	}
 	
@@ -242,7 +240,7 @@ public final class Collider {
 		if(checkReiterate) checkForReiteration();
 		int newGroup = curHitBox.getGroup();
 		if(newGroup != oldGroup && !changeInteractivity) throw new RuntimeException();
-		for(HitBox b : overlapSetPool.iterator(curHitBox.overlapSet)) {
+		for(HitBox b : curHitBox.overlapSet) {
 			if(!b.testMark(testId)) throw new RuntimeException();
 			if(newGroup < 0 || (changeInteractivity && !interactTester.canInteract(curHitBox, b))) {
 				hitBoxRemoveBuffer.add(b);
@@ -252,10 +250,10 @@ public final class Collider {
 			}
 		}
 		for(HitBox b : hitBoxRemoveBuffer) {
-			curHitBox.overlapSet = overlapSetPool.remove(curHitBox.overlapSet, b);
-			if(!overlapSetPool.wasSuccessful()) throw new RuntimeException();
-			b.overlapSet = overlapSetPool.remove(b.overlapSet, curHitBox);
-			if(!overlapSetPool.wasSuccessful()) throw new RuntimeException();
+			boolean success = curHitBox.overlapSet.remove(b);
+			if(!success) throw new RuntimeException();
+			success = b.overlapSet.remove(curHitBox);
+			if(!success) throw new RuntimeException();
 			numOverlaps--;
 		}
 		hitBoxRemoveBuffer.clear();
@@ -285,19 +283,19 @@ public final class Collider {
 		HitBox b = cEvent.getSecond();
 		if(cEvent.isCollision()) {
 			if(interactTester.canInteract(a, b)) {
-				a.overlapSet = overlapSetPool.add(a.overlapSet, b);
-				if(!overlapSetPool.wasSuccessful()) throw new RuntimeException();
-				b.overlapSet = overlapSetPool.add(b.overlapSet, a);
-				if(!overlapSetPool.wasSuccessful()) throw new RuntimeException();
+				boolean success = a.overlapSet.add(b);
+				if(!success) throw new RuntimeException();
+				success = b.overlapSet.add(a);
+				if(!success) throw new RuntimeException();
 				numOverlaps++;
 				if(!cEvent.involves(curHitBox)) checkForSeparation(a, b);
 			}
 		}
 		else {
-			a.overlapSet = overlapSetPool.remove(a.overlapSet, b);
-			if(!overlapSetPool.wasSuccessful()) throw new RuntimeException();
-			b.overlapSet = overlapSetPool.remove(b.overlapSet, a);
-			if(!overlapSetPool.wasSuccessful()) throw new RuntimeException();
+			boolean success = a.overlapSet.remove(b);
+			if(!success) throw new RuntimeException();
+			success = b.overlapSet.remove(a);
+			if(!success) throw new RuntimeException();
 			numOverlaps--;
 			if(!cEvent.involves(curHitBox) && interactTester.canInteract(a, b)) {
 				checkForCollision(a, b);
@@ -332,17 +330,6 @@ public final class Collider {
 		double collideTime = collisionTester.separateTime(a, b, time);
 		if(collideTime < Double.POSITIVE_INFINITY) {
 			queue(new ECollide(a, b, collideTime, false));
-		}
-	}
-	
-	private abstract class HitBoxPool <T extends HitBox> extends Pool<T> {
-		@Override public T obtain() {
-			hitBoxesInUse++;
-			return super.obtain();
-		}
-		@Override public void free(T hitBox) {
-			hitBoxesInUse--;
-			super.free(hitBox);
 		}
 	}
 }

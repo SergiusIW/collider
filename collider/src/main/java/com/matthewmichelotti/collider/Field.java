@@ -16,13 +16,13 @@
 
 package com.matthewmichelotti.collider;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 final class Field {
-	private SetPool<HitBox> setPool = new SetPool<HitBox>();
-	private HashMap<Long, Object> data;
+	private HashMap<Long, TightSet<HitBox>> data;
 	private double cellWidth;
 	
 	private int numEntries = 0;
@@ -35,7 +35,7 @@ final class Field {
 	Field(ColliderOpts opts) {
 		if(opts.cellWidth <= 0.0) throw new IllegalArgumentException();
 		cellWidth = opts.cellWidth;
-		data = new HashMap<Long, Object>();
+		data = new HashMap<Long, TightSet<HitBox>>();
 	}
 	
 	int getNumEntries() {return numEntries;}
@@ -77,20 +77,22 @@ final class Field {
 	
 	private void addToCell(HitBox hitBox, int x, int y, int group) {
 		long key = getKey(x, y, group);
-		Object oldSetObj = data.get(key);
-		Object newSetObj = setPool.add(oldSetObj, hitBox);
-		if(!setPool.wasSuccessful()) throw new RuntimeException();
-		if(newSetObj != oldSetObj) data.put(key, newSetObj);
+		TightSet<HitBox> set = data.get(key);
+		if(set == null) {
+			set = new TightSet<>();
+			data.put(key, set);
+		}
+		boolean success = set.add(hitBox);
+		if(!success) throw new RuntimeException();
 		numEntries++;
 	}
 
 	private void removeFromCell(HitBox hitBox, int x, int y, int group) {
 		long key = getKey(x, y, group);
-		Object oldSetObj = data.get(key);
-		Object newSetObj = setPool.remove(oldSetObj, hitBox);
-		if(!setPool.wasSuccessful()) throw new RuntimeException();
-		if(newSetObj == null) data.remove(key);
-		else if(newSetObj != oldSetObj) data.put(key, newSetObj);
+		TightSet<HitBox> set = data.get(key);
+		boolean success = set.remove(hitBox);
+		if(!success) throw new RuntimeException();
+		if(set.isEmpty()) data.remove(key);
 		numEntries--;
 	}
 
@@ -121,7 +123,7 @@ final class Field {
 	
 	private class HitBoxIter implements Iterator<HitBox>, Iterable<HitBox> {
 		private final IntBox.Iterator boxIter = new IntBox.Iterator();
-		private final SetPool.SetIterator<HitBox> cellIter = new SetPool.SetIterator<>();
+		private Iterator<HitBox> cellIter;
 		private int[] groups;
 		private int groupIndex;
 		private HitBox next;
@@ -160,11 +162,13 @@ final class Field {
 		
 		private void initCellIter() {
 			long key = getKey(boxIter.getX(), boxIter.getY(), groups[groupIndex]);
-			cellIter.init(data.get(key));
+			TightSet<HitBox> set = data.get(key);
+			if(set == null) cellIter = Collections.<HitBox>emptyList().iterator();
+			else cellIter = set.iterator();
 		}
 		
 		private void clear() {
-			cellIter.clear();
+			cellIter = null;
 			groups = null;
 			groupIndex = 0;
 			next = null;
