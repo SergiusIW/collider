@@ -16,6 +16,7 @@
 
 package com.matthewmichelotti.collider;
 
+import com.matthewmichelotti.collider.geom.PlacedShape;
 import com.matthewmichelotti.collider.geom.Shape;
 import com.matthewmichelotti.collider.geom.Vec2d;
 
@@ -26,6 +27,10 @@ public final class HitboxState {
 	private Shape shape;
 	private Shape shapeVel;
 	private double endTime;
+
+	public HitboxState(PlacedShape shape) {
+		this(shape.getPos(), shape.getShape());
+	}
 
 	public HitboxState(Vec2d pos, Shape shape) {
 		if(pos == null || shape == null) throw new NullPointerException();
@@ -54,6 +59,10 @@ public final class HitboxState {
 
 	public double getEndTime() {
 		return endTime;
+	}
+
+	public PlacedShape getPlacedShape() {
+		return new PlacedShape(pos, shape);
 	}
 
 	public void setPos(Vec2d pos) {
