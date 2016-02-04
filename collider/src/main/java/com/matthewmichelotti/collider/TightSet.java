@@ -19,7 +19,6 @@ package com.matthewmichelotti.collider;
 import java.util.HashSet;
 import java.util.Iterator;
 
-//TODO optimize to improve demos framerate...
 class TightSet<T> implements Iterable<T> {
 	private final static int MIN_SIZE = 4;
 

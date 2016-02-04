@@ -22,6 +22,7 @@ package com.matthewmichelotti.collider;
  * @author Matthew Michelotti
  * @see HitBox#getNormal(HitBox)
  */
+@Deprecated
 public final class Normal {
 	double x, y, overlap;
 	
