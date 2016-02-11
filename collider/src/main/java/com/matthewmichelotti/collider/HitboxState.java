@@ -21,12 +21,14 @@ import com.matthewmichelotti.collider.geom.Shape;
 import com.matthewmichelotti.collider.geom.Vec2d;
 
 //TODO javadoc
-public final class HitboxState {
+public final class HitboxState implements Cloneable {
 	private Vec2d pos;
 	private Vec2d vel;
 	private Shape shape;
 	private Shape shapeVel;
-	private double endTime;
+	private double remainingTime;
+	private int groupId;
+	private boolean interactivityChange;
 
 	public HitboxState(PlacedShape shape) {
 		this(shape.getPos(), shape.getShape());
@@ -38,7 +40,7 @@ public final class HitboxState {
 		this.vel = Vec2d.ZERO;
 		this.shape = shape;
 		this.shapeVel = shape.isCircle() ? Shape.ZERO_CIRCLE : Shape.ZERO_RECT;
-		this.endTime = Double.POSITIVE_INFINITY;
+		this.remainingTime = Double.POSITIVE_INFINITY;
 	}
 
 	public Vec2d getPos() {
@@ -57,12 +59,20 @@ public final class HitboxState {
 		return shapeVel;
 	}
 
-	public double getEndTime() {
-		return endTime;
+	double getRemainingTime() {
+		return remainingTime;
+	}
+
+	public int getGroupId() {
+		return groupId;
 	}
 
 	public PlacedShape getPlacedShape() {
 		return new PlacedShape(pos, shape);
+	}
+
+	PlacedShape getPlacedShapeVel() {
+		return new PlacedShape(vel, shapeVel);
 	}
 
 	public void setPos(Vec2d pos) {
@@ -85,7 +95,33 @@ public final class HitboxState {
 		this.shapeVel = shapeVel;
 	}
 
-	public void setEndTime(double endTime) {
-		this.endTime = endTime;
+	public void setRemainingTime(double remainingTime) {
+		this.remainingTime = remainingTime;
+	}
+
+	public void setGroupId(int groupId) {
+		this.groupId = groupId;
+	}
+
+	public void interactivityChange() {
+		this.interactivityChange = true;
+	}
+
+	HitboxState advance(double timeDelta) {
+		Vec2d newPos = pos.add(vel.scale(timeDelta));
+		Shape newShape = shape.add(shapeVel.scale(timeDelta));
+		HitboxState newState = new HitboxState(newPos, newShape);
+		newState.setVel(vel);
+		newState.setShapeVel(shapeVel);
+		return newState;
+	}
+
+	@Override
+	public HitboxState clone() {
+		try {
+			return (HitboxState) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

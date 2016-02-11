@@ -54,4 +54,13 @@ public final class Shape {
 	public boolean isRect() {
 		return !circle;
 	}
+
+	public Shape add(Shape delta) {
+		if(circle != delta.circle) throw new IllegalStateException("cannot add rect and circle together");
+		return new Shape(circle, width + delta.width, height + delta.height);
+	}
+
+	public Shape scale(double scalar) {
+		return new Shape(circle, width*scalar, height*scalar);
+	}
 }

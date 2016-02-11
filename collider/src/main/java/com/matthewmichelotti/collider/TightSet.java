@@ -19,7 +19,7 @@ package com.matthewmichelotti.collider;
 import java.util.HashSet;
 import java.util.Iterator;
 
-class TightSet<T> implements Iterable<T> {
+final class TightSet<T> implements Iterable<T> {
 	private final static int MIN_SIZE = 4;
 
 	private HashSet<T> set = new HashSet<T>(MIN_SIZE);

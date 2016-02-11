@@ -44,4 +44,22 @@ public final class Vec2d {
 		if(length == 0.0) throw new IllegalStateException("can't normalize vector of length 0");
 		return new Vec2d(x/length, y/length);
 	}
+
+	public double distanceSq(Vec2d other) {
+		double dx = x - other.x;
+		double dy = y - other.y;
+		return dx*dx + dy*dy;
+	}
+
+	public double distance(Vec2d other) {
+		return Math.sqrt(this.distanceSq(other));
+	}
+
+	public Vec2d add(Vec2d delta) {
+		return new Vec2d(x + delta.x, y + delta.y);
+	}
+
+	public Vec2d scale(double scalar) {
+		return new Vec2d(x*scalar, y*scalar);
+	}
 }

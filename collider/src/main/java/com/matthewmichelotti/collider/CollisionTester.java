@@ -16,6 +16,7 @@
 
 package com.matthewmichelotti.collider;
 
+@Deprecated
 final class CollisionTester {
 	private double separateBuffer;
 	private HBRect dummyRect = new HBRect();
@@ -158,19 +159,9 @@ final class CollisionTester {
 	
 	private double rectCircCollideTime(HBRect a, HBCircle b, double startTime, double endTime)
 	{
-//		if(!forCollide) {
-//			pair.init(a, b);
-//			double overlap = pair.getOverlap();
-//			pair.clear();
-//			if(overlap <= 0.0) return startTime;
-//		}
 		dummyRect.dummyMimicCircle(b);
 		double time = rectRectTime(a, dummyRect, startTime, endTime, true);
 		if(time >= endTime) return Double.POSITIVE_INFINITY;
-//		if(time >= endTime) {
-//			if(forCollide) return Double.POSITIVE_INFINITY;
-//			else time = endTime;
-//		}
 		
 		for(int dir = 0; dir < 2; dir++) {
 			double hiEdge = a.getEdgeComp(dir, time);

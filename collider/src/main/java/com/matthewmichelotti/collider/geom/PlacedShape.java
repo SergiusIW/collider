@@ -44,4 +44,28 @@ public final class PlacedShape {
 		//TODO implement
 		throw new RuntimeException("not implemented");
 	}
+
+	public PlacedShape add(PlacedShape delta) {
+		return new PlacedShape(pos.add(delta.pos), shape.add(delta.shape));
+	}
+
+	public PlacedShape scale(double scalar) {
+		return new PlacedShape(pos.scale(scalar), shape.scale(scalar));
+	}
+
+	public double getLeft() {
+		return getPos().getX() - .5*getShape().getWidth();
+	}
+
+	public double getBottom() {
+		return getPos().getY() - .5*getShape().getHeight();
+	}
+
+	public double getRight() {
+		return getPos().getX() + .5*getShape().getWidth();
+	}
+
+	public double getTop() {
+		return getPos().getY() + .5*getShape().getHeight();
+	}
 }
