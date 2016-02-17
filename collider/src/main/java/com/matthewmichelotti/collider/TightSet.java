@@ -16,6 +16,7 @@
 
 package com.matthewmichelotti.collider;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -45,9 +46,17 @@ final class TightSet<T> implements Iterable<T> {
 		return result;
 	}
 
+	boolean contains(T value) {
+		return set.contains(value);
+	}
+
 	@Override
 	public Iterator<T> iterator() {
 		return set.iterator();
+	}
+
+	ArrayList<T> valuesToList() {
+		return new ArrayList<>(set);
 	}
 
 	boolean isEmpty() {

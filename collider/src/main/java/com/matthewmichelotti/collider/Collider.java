@@ -18,6 +18,8 @@ package com.matthewmichelotti.collider;
 
 import java.util.ArrayList;
 import java.util.PriorityQueue;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Class for managing
@@ -31,59 +33,54 @@ import java.util.PriorityQueue;
  * @see HitBox
  * @author Matthew Michelotti
  */
-//TODO remove dependencies on copied LibGDX code, consider using HPPC dependency instead...
-//TODO consider using Apache Commons Vector2D for certain return types...
+//TODO fix javadocs
 public final class Collider {
-	private Field field;
+	private final Field field;
 	private double time = 0.0;
-	private CollisionTester collisionTester;
-	private InteractTester interactTester;
-	private double maxForesightTime;
-	private PriorityQueue<FunctionEvent> queue = new PriorityQueue<FunctionEvent>();
-	private ColliderEvent cEvent = new ColliderEvent();
-	private boolean processedCollision = true;
-	
-	private HitBox curHitBox;
-	private IntBox oldBounds = new IntBox();
-	private IntBox newBounds = new IntBox();
-	private int oldGroup;
+	private final InteractTester interactTester;
+	private final TreeSet<FunctionEvent> queue = new TreeSet<>();
+	private final double separateBuffer;
+
 	private int nextEventId = 0;
-	private boolean changeInteractivity = false;
-	
-	private ArrayList<HitBox> hitBoxRemoveBuffer = new ArrayList<>();
-	
 	private int testId = 0;
 	
 	private int hitBoxesInUse = 0;
 	private int numOverlaps = 0;
-	
+
 	/**
-	 * Constructs a new Collider.
-	 * @param opts Desired settings for the Collider.
+	 * Constructor.
+	 *
+	 * @param interactTester Used to determine which pairs of HitBoxes should be tested for collisions.
+	 * @param cellWidth An efficiency parameter representing the width and height of a
+	 * cell in the Collider grid.
+	 * The Collider references HitBoxes in a conceptually infinite grid
+	 * in order to reduce the number of collisions that need to be tested.
+	 * If your game uses a grid layout, it would be a good choice
+	 * to use the same cell width (or a power of two times that cell width).
+	 * Otherwise, a good guideline is that most of the HitBoxes should
+	 * have width and height less than cellWidth.
+	 * @param separateBuffer Roughly the distance that two collided HitBoxes must be from each other before
+	 * a separated event is generated.  This must be non-zero due to numerical stability
+	 * issues.  A good choice for most games is around 1/10 of a "pixel",
+	 * since that won't be noticeable.
 	 */
-	public Collider(ColliderOpts opts) {
-		if(opts.interactTester == null) throw new IllegalArgumentException();
-		if(opts.maxForesightTime <= 0.0) throw new IllegalArgumentException();
-		field = new Field(opts);
-		collisionTester = new CollisionTester(opts);
-		interactTester = opts.interactTester;
-		maxForesightTime = opts.maxForesightTime;
+	public Collider(InteractTester interactTester, double cellWidth, double separateBuffer) {
+		if(interactTester == null) throw new NullPointerException("interactTester must be non-null");
+		if(cellWidth <= 0.0) throw new IllegalArgumentException("cellWidth must be positive");
+		if(separateBuffer <= 0.0) throw new IllegalArgumentException("separateBuffer must be positive");
+		this.interactTester = interactTester;
+		this.separateBuffer = separateBuffer;
+		field = new Field(cellWidth);
 	}
-	
+
 	/**
-	 * Obtains a rectangular HitBox to be used with this Collider.
-	 * @return a new HBRect
+	 * Constructs a new HitBox to be used with this Collider.
+	 * @param state initial state of the hitbox
+	 * @param owner the owner object to be associated with the hitbox
+	 * @return a new hitbox
 	 */
-	public HBRect makeRect() {
-		return new HBRect(this);
-	}
-	
-	/**
-	 * Obtains a circular HitBox to be used with this Collider.
-	 * @return a new HBCircle
-	 */
-	public HBCircle makeCircle() {
-		return new HBCircle(this);
+	public HitBox newHitbox(HitboxState state, Object owner) {
+		return new HitBox(this, state, owner);
 	}
 	
 	/**
@@ -94,8 +91,13 @@ public final class Collider {
 	 * @return A description of the collision/separation, or null if no collision/separation occurred.
 	 *   This object will be reused whenever stepToTime is called.
 	 */
-	public ColliderEvent stepToTime(double newTime) {
-		return stepToTime(newTime, true);
+	public ColliderEvent advance(double maxTime) {
+		return advance(maxTime, true);
+	}
+
+	private FunctionEvent peekQueue() {
+		if(queue.isEmpty()) return null;
+		return queue.first();
 	}
 	
 	/**
@@ -110,21 +112,20 @@ public final class Collider {
 	 * @return A description of the collision/separation, or null if no collision/separation occurred.
 	 *   This object will be reused whenever stepToTime is called.
 	 */
-	public ColliderEvent stepToTime(double newTime, boolean inclusive) {
-		if(newTime < time) throw new IllegalArgumentException();
-		processCurHBAndCollision();
-		cEvent.clear();
-		for(FunctionEvent evt = queue.peek();
-				evt != null && (inclusive ? evt.time <= newTime : evt.time < newTime);
-				evt = queue.peek())
+	public ColliderEvent advance(double maxTime, boolean inclusive) {
+		if(maxTime < time) throw new IllegalArgumentException();
+		for(FunctionEvent evt = peekQueue();
+				evt != null && (inclusive ? evt.getTime() <= maxTime : evt.getTime() < maxTime);
+				evt = peekQueue())
 		{
-			queue.poll();
-			time = evt.time;
-			evt.resolve(this);
-			if(cEvent.isInitialized()) return cEvent;
-			processCurHBAndCollision();
+			queue.pollFirst();
+			time = evt.getTime();
+			evt.getFirst().events.remove(evt);
+			if(evt.isPairEvent()) evt.getSecond().events.remove(evt);
+			ColliderEvent colliderEvent = evt.resolve(this);
+			if(colliderEvent != null) return colliderEvent;
 		}
-		time = newTime;
+		time = maxTime;
 		return null;
 	}
 	
@@ -150,10 +151,9 @@ public final class Collider {
 	 * @see com.matthewmichelotti.collider.util.ContProcess
 	 */
 	public double peekNextEventTime() {
-		processCurHBAndCollision();
-		FunctionEvent evt = queue.peek();
+		FunctionEvent evt = peekQueue();
 		if(evt == null) return Double.POSITIVE_INFINITY;
-		else return evt.time;
+		else return evt.getTime();
 	}
 	
 	/**
@@ -174,162 +174,95 @@ public final class Collider {
 		System.out.println(" overlaps: " + numOverlaps);
 		System.out.println("-----------------------------");
 	}
-	
-	Normal getNormal(HitBox source, HitBox dest) {
-		return collisionTester.normal(source, dest, time);
-	}
 
-	void free(HBRect hitBox) {
-		removeHitBoxReferences(hitBox);
-	}
-	
-	void free(HBCircle hitBox) {
-		removeHitBoxReferences(hitBox);
-	}
-	
-	private void removeHitBoxReferences(HitBox hitBox) {
-		if(!processedCollision && cEvent.involves(hitBox)) {
-			cEvent.clear();
-			processedCollision = true;
-		}
-		altering(hitBox);
-		field.remove(hitBox, oldGroup, oldBounds, null);
-		for(HitBox b : hitBox.overlapSet) {
-			boolean success = b.overlapSet.remove(hitBox);
-			if(!success) throw new RuntimeException();
-			numOverlaps--;
-		}
-		hitBox.overlapSet.clear();
-		curHitBox = null;
-	}
-	
-	void altering(HitBox hitBox) {
-		altering(hitBox, false);
-	}
-	
-	void altering(HitBox hitBox, boolean changeInteractivity) {
-		if(!hitBox.isInitialized()) throw new RuntimeException("cannot alter hitBox after freed");
-		if(curHitBox == hitBox) {
-			hitBox.endTime = -1;
-			if(changeInteractivity) this.changeInteractivity = true;
-			return;
-		}
-		if(curHitBox != null) processCurHBAndCollision();
-		this.curHitBox = hitBox;
-		this.changeInteractivity = changeInteractivity;
-		field.getIndexBounds(hitBox, oldBounds);
-		oldGroup = hitBox.getGroup();
-		hitBox.markTransitionStart();
-	}
-
-	void queue(FunctionEvent event) {
-		event.id = nextEventId;
-		nextEventId++;
-		queue.add(event);
-	}
-
-	void processCurHBAndCollision() {
-		processCurHBAndCollision(true);
-	}
-	
-	void processCurHBAndCollision(boolean checkReiterate) {
-		processCollision();
-		if(curHitBox == null) return;
-		if(curHitBox.endTime < time) throw new RuntimeException("HitBox altered but HitBox.commit was not called");
+	void updateHitbox(final HitBox hitbox, HitboxState newStatePublic) {
+		clearRelatedEvents(hitbox);
 		testId++;
-		if(checkReiterate) checkForReiteration();
-		int newGroup = curHitBox.getGroup();
-		if(newGroup != oldGroup && !changeInteractivity) throw new RuntimeException();
-		for(HitBox b : curHitBox.overlapSet) {
-			if(!b.testMark(testId)) throw new RuntimeException();
-			if(newGroup < 0 || (changeInteractivity && !interactTester.canInteract(curHitBox, b))) {
-				hitBoxRemoveBuffer.add(b);
-			}
-			else {
-				checkForSeparation(curHitBox, b);
-			}
+
+		HitboxState oldState = hitbox.getInternalStateAtStartTime();
+		IntBox oldBounds = field.getIndexBounds(oldState);
+
+		HitboxState newState = newStatePublic.clone();
+		if(newState.getGroup() >= 0) newState.setRemainingTime(Math.min(newState.getRemainingTime(), field.getGridPeriod(newState)));
+		IntBox newBounds = field.getIndexBounds(newState);
+
+		if(oldState.getGroup() == newState.getGroup()) {
+			field.remove(hitbox, oldState.getGroup(), oldBounds, newBounds);
+			field.add(hitbox, newState.getGroup(), oldBounds, newBounds);
+		} else {
+			field.remove(hitbox, oldState.getGroup(), oldBounds, null);
+			field.add(hitbox, newState.getGroup(), null, newBounds);
 		}
-		for(HitBox b : hitBoxRemoveBuffer) {
-			boolean success = curHitBox.overlapSet.remove(b);
-			if(!success) throw new RuntimeException();
-			success = b.overlapSet.remove(curHitBox);
-			if(!success) throw new RuntimeException();
-			numOverlaps--;
-		}
-		hitBoxRemoveBuffer.clear();
-		field.getIndexBounds(curHitBox, newBounds);
-		if(oldGroup == newGroup) field.remove(curHitBox, oldGroup, oldBounds, newBounds);
-		else field.remove(curHitBox, oldGroup, oldBounds, null);
-		int[] groupArr = null;
-		if(newGroup >= 0) groupArr = interactTester.getInteractGroups(curHitBox);
-		curHitBox.testMark(testId);
-		if(groupArr != null && groupArr.length > 0) {
-			for (HitBox b : field.iterator(newBounds, groupArr, testId)) {
-				if (interactTester.canInteract(curHitBox, b)) {
-					checkForCollision(curHitBox, b);
+
+		hitbox.setState(newStatePublic, newState.getRemainingTime());
+
+		if(newState.getGroup() >= 0) {
+			for(HitBox otherHitbox : field.iterator(newBounds, interactTester.getInteractGroups(hitbox), testId)) {
+				if(hitbox.overlapSet.contains(otherHitbox)) continue;
+				if(!interactTester.canInteract(hitbox, otherHitbox)) continue;
+				collisionCheck(hitbox, otherHitbox);
+			}
+
+			for(HitBox otherHitbox : newStatePublic.interactivityChange ? hitbox.overlapSet.valuesToList() : hitbox.overlapSet) {
+				if(newStatePublic.interactivityChange && !interactTester.canInteract(hitbox, otherHitbox)) {
+					hitbox.overlapSet.remove(otherHitbox);
+				} else {
+					separationCheck(hitbox, otherHitbox);
 				}
 			}
-		}
-		if(oldGroup == newGroup) field.add(curHitBox, newGroup, oldBounds, newBounds);
-		else field.add(curHitBox, newGroup, null, newBounds);
-		curHitBox = null;
-		changeInteractivity = false;
-	}
-	
-	private void processCollision() {
-		if(processedCollision) return;
-		processedCollision = true;
-		HitBox a = cEvent.getFirst();
-		HitBox b = cEvent.getSecond();
-		if(cEvent.isCollision()) {
-			if(interactTester.canInteract(a, b)) {
-				boolean success = a.overlapSet.add(b);
-				if(!success) throw new RuntimeException();
-				success = b.overlapSet.add(a);
-				if(!success) throw new RuntimeException();
-				numOverlaps++;
-				if(!cEvent.involves(curHitBox)) checkForSeparation(a, b);
+
+			if(newState.getRemainingTime() != newStatePublic.getRemainingTime()) {
+				queueFunctionEvent(new FunctionEvent(newState.getRemainingTime(), nextEventId++, hitbox, null) {
+					@Override ColliderEvent resolve(Collider collider) {
+						updateHitbox(hitbox, hitbox.getState());
+						return null;
+					}
+				});
 			}
-		}
-		else {
-			boolean success = a.overlapSet.remove(b);
-			if(!success) throw new RuntimeException();
-			success = b.overlapSet.remove(a);
-			if(!success) throw new RuntimeException();
-			numOverlaps--;
-			if(!cEvent.involves(curHitBox) && interactTester.canInteract(a, b)) {
-				checkForCollision(a, b);
-			}
+		} else {
+			hitbox.overlapSet.clear();
 		}
 	}
 
-	void setCollision(HitBox a, HitBox b, boolean collided) {
-		cEvent.init(a, b, collided);
-		processedCollision = false;
+	private void collisionCheck(final HitBox a, final HitBox b) {
+		double collideTime = CollisionTests.collideTime(a.getInternalState(), b.getInternalState());
+		if(collideTime == Double.POSITIVE_INFINITY) return;
+		queueFunctionEvent(new FunctionEvent(collideTime, nextEventId++, a, b) {
+			@Override ColliderEvent resolve(Collider collider) {
+				boolean success = a.overlapSet.add(b);
+				success &= b.overlapSet.add(a);
+				if(!success) throw new IllegalStateException();
+				separationCheck(a, b);
+				return ColliderEvent.newCollide(a, b);
+			}
+		});
 	}
-	
-	private void checkForReiteration() {
-		if(!curHitBox.isMoving()) return;
-		double period = field.getGridPeriod(curHitBox);
-		if(period > maxForesightTime) period = maxForesightTime;
-		double firstReiterTime = time + period;
-		if(firstReiterTime >= curHitBox.endTime) return;
-		EReiterate event = new EReiterate(curHitBox, firstReiterTime, curHitBox.endTime, period);
-		curHitBox.endTime = firstReiterTime;
-		queue(event);
+
+	private void separationCheck(final HitBox a, final HitBox b) {
+		double separateTime = CollisionTests.separateTime(a.getInternalState(), b.getInternalState(), separateBuffer);
+		if(separateTime == Double.POSITIVE_INFINITY) return;
+		queueFunctionEvent(new FunctionEvent(separateTime, nextEventId++, a, b) {
+			@Override ColliderEvent resolve(Collider collider) {
+				boolean success = a.overlapSet.remove(b);
+				success &= b.overlapSet.remove(a);
+				if(!success) throw new IllegalStateException();
+				collisionCheck(a, b);
+				return ColliderEvent.newSeparation(a, b);
+			}
+		});
 	}
-	
-	private void checkForCollision(HitBox a, HitBox b) {
-		double collideTime = collisionTester.collideTime(a, b, time);
-		if(collideTime < Double.POSITIVE_INFINITY) {
-			queue(new ECollide(a, b, collideTime, true));
+
+	private void queueFunctionEvent(FunctionEvent event) {
+		queue.add(event);
+		event.getFirst().events.add(event);
+		if(event.isPairEvent()) event.getSecond().events.add(event);
+	}
+
+	private void clearRelatedEvents(HitBox hitbox) {
+		for(FunctionEvent event : hitbox.events) {
+			queue.remove(event);
+			if(event.isPairEvent()) event.getOther(hitbox).events.remove(event);
 		}
-	}
-	
-	private void checkForSeparation(HitBox a, HitBox b) {
-		double collideTime = collisionTester.separateTime(a, b, time);
-		if(collideTime < Double.POSITIVE_INFINITY) {
-			queue(new ECollide(a, b, collideTime, false));
-		}
+		hitbox.events.clear();
 	}
 }

@@ -18,7 +18,9 @@ package com.matthewmichelotti.collider;
 
 import com.matthewmichelotti.collider.geom.Shape;
 
-class CollisionTests {
+final class CollisionTests {
+	private final static double HIGH_TIME = 1e50;
+
 	private CollisionTests() {
 	}
 
@@ -44,6 +46,10 @@ class CollisionTests {
 		}
 
 		return timeUnpadded(a, b, false);
+	}
+
+	private static double getRemainingTime(HitboxState a, HitboxState b) {
+		return Math.min(HIGH_TIME, Math.min(a.getRemainingTime(), b.getRemainingTime()));
 	}
 
 	private static HitboxState cloneHitboxWithTime(HitboxState hitbox, double remainingTime) {
@@ -72,7 +78,7 @@ class CollisionTests {
 	}
 
 	private static boolean boundingBoxTest(HitboxState a, HitboxState b) {
-		return ShapeUtil.getBoundingBox(a).overlaps(ShapeUtil.getBoundingBox(b));
+		return a.getBoundingBox().overlaps(b.getBoundingBox());
 	}
 
 	private static double rectRectTime(HitboxState a, HitboxState b, boolean forCollide) {
@@ -123,8 +129,8 @@ class CollisionTests {
 
 	private static double rectCircleCollideTime(HitboxState rect, HitboxState circle) {
 		double baseTime = rectRectTime(rect, circle, true);
-		if(baseTime == Double.POSITIVE_INFINITY) return Double.POSITIVE_INFINITY;
-		return baseTime + rebasedRectCircleCollideTime(rect.advance(baseTime), circle.advance(baseTime));
+		if(baseTime >= rect.getRemainingTime()) return Double.POSITIVE_INFINITY;
+		return baseTime + rebasedRectCircleCollideTime(rect.advance(0.0, baseTime), circle.advance(0.0, baseTime));
 	}
 
 	private static double rebasedRectCircleCollideTime(HitboxState rect, HitboxState circle) {
@@ -140,11 +146,11 @@ class CollisionTests {
 	{
 		double baseTime = rectRectTime(rect, circle, false);
 		if(baseTime == 0.0) return 0.0;
-		if(baseTime == Double.POSITIVE_INFINITY) return Double.POSITIVE_INFINITY;
-		rect = rect.advance(baseTime);
-		circle = circle.advance(baseTime);
-		ShapeUtil.reverseVels(rect);
-		ShapeUtil.reverseVels(circle);
+		if(baseTime >= HIGH_TIME) return Double.POSITIVE_INFINITY;
+		rect = rect.advance(0.0, baseTime);
+		circle = circle.advance(0.0, baseTime);
+		rect.reverseVels();
+		circle.reverseVels();
 		double result = baseTime - rebasedRectCircleCollideTime(rect, circle);
 		return Math.max(result, 0.0);
 	}

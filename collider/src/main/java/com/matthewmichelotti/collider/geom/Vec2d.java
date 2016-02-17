@@ -62,4 +62,26 @@ public final class Vec2d {
 	public Vec2d scale(double scalar) {
 		return new Vec2d(x*scalar, y*scalar);
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Vec2d vec2d = (Vec2d) o;
+
+		if (Double.compare(vec2d.x, x) != 0) return false;
+		return Double.compare(vec2d.y, y) == 0;
+	}
+
+	@Override
+	public int hashCode() {
+		int result;
+		long temp;
+		temp = Double.doubleToLongBits(x);
+		result = (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(y);
+		result = 1299227 * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
 }

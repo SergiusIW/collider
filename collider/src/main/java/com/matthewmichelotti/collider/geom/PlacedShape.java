@@ -68,4 +68,22 @@ public final class PlacedShape {
 	public double getTop() {
 		return getPos().getY() + .5*getShape().getHeight();
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		PlacedShape that = (PlacedShape) o;
+
+		if (!pos.equals(that.pos)) return false;
+		return shape.equals(that.shape);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = pos.hashCode();
+		result = 1299227 * result + shape.hashCode();
+		return result;
+	}
 }

@@ -37,4 +37,25 @@ public final class DirVec2d {
 	public Vec2d toVector() {
 		return new Vec2d(direction.getX()*length, direction.getY()*length);
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		DirVec2d dirVec2d = (DirVec2d) o;
+
+		if (Double.compare(dirVec2d.length, length) != 0) return false;
+		return direction.equals(dirVec2d.direction);
+	}
+
+	@Override
+	public int hashCode() {
+		int result;
+		long temp;
+		result = direction.hashCode();
+		temp = Double.doubleToLongBits(length);
+		result = 1299227 * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
 }

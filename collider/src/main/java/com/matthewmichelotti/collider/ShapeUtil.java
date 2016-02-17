@@ -23,13 +23,7 @@ import com.matthewmichelotti.collider.geom.Vec2d;
 final class ShapeUtil {
 	private ShapeUtil() {}
 
-	static PlacedShape getBoundingBox(HitboxState hitbox) {
-		PlacedShape startShape = hitbox.getPlacedShape();
-		PlacedShape endShape = hitbox.getPlacedShape().add(hitbox.getPlacedShapeVel().scale(hitbox.getRemainingTime()));
-		return getBoundingBox(startShape, endShape);
-	}
-
-	private static PlacedShape getBoundingBox(PlacedShape a, PlacedShape b) {
+	static PlacedShape getBoundingBox(PlacedShape a, PlacedShape b) {
 		double right = Math.max(a.getRight(), b.getRight());
 		double top = Math.max(a.getTop(), b.getTop());
 		double left = Math.min(a.getLeft(), b.getLeft());
@@ -94,10 +88,5 @@ final class ShapeUtil {
 		boolean isCorner() {
 			return x != 0 && y != 0;
 		}
-	}
-
-	static void reverseVels(HitboxState hitbox) {
-		hitbox.setVel(hitbox.getVel().scale(-1.0));
-		hitbox.setShapeVel(hitbox.getShapeVel().scale(-1.0));
 	}
 }

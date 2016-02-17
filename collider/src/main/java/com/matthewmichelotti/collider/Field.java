@@ -16,67 +16,63 @@
 
 package com.matthewmichelotti.collider;
 
+import com.matthewmichelotti.collider.geom.PlacedShape;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 final class Field {
-	private HashMap<Long, TightSet<HitBox>> data;
+	private HashMap<TileKey, TightSet<HitBox>> data;
 	private double cellWidth;
-	
 	private int numEntries = 0;
 	
-	private IntBox.Iterator boxIter = new IntBox.Iterator();
-	private IntBox.DiffIterator diffIter = new IntBox.DiffIterator();
-	
-	private HitBoxIter iter = new HitBoxIter();
-	
-	Field(ColliderOpts opts) {
-		if(opts.cellWidth <= 0.0) throw new IllegalArgumentException();
-		cellWidth = opts.cellWidth;
-		data = new HashMap<Long, TightSet<HitBox>>();
+	Field(double cellWidth) {
+		if(cellWidth <= 0.0) throw new IllegalArgumentException("cellWidth must be positive");
+		this.cellWidth = cellWidth;
+		data = new HashMap<>();
 	}
 	
 	int getNumEntries() {return numEntries;}
 	
 	void remove(HitBox hitBox, int group, IntBox oldBox, IntBox newBox) {
 		if(group < 0) return;
-		Int2DIterator iter = iterator(oldBox, newBox);
-		for(; !iter.isDone(); iter.next()) {
+		for(Int2DIterator iter = oldBox.diffIterator(newBox); !iter.isDone(); iter.next()) {
 			removeFromCell(hitBox, iter.getX(), iter.getY(), group);
 		}
 	}
-	
+
 	void add(HitBox hitBox, int group, IntBox oldBox, IntBox newBox) {
 		if(group < 0) return;
-		Int2DIterator iter = iterator(newBox, oldBox);
-		for(; !iter.isDone(); iter.next()) {
+		for(Int2DIterator iter = newBox.diffIterator(oldBox); !iter.isDone(); iter.next()) {
 			addToCell(hitBox, iter.getX(), iter.getY(), group);
 		}
 	}
-	
+
 	//NOTE: should iterate to completion
 	Iterable<HitBox> iterator(IntBox region, int[] groups, int testId) {
-		iter.init(region, groups, testId);
-		return iter;
+		return new HitBoxIter(region, groups, testId);
+	}
+
+	IntBox getIndexBounds(HitboxState hitbox) {
+		PlacedShape box = hitbox.getBoundingBox();
+		IntBox result = new IntBox();
+		result.l = (int)Math.floor(box.getLeft()/cellWidth);
+		result.b = (int)Math.floor(box.getBottom()/cellWidth);
+		result.r = Math.max(result.l, (int)Math.ceil(box.getRight()/cellWidth) - 1);
+		result.t = Math.max(result.b, (int)Math.ceil(box.getTop()/cellWidth) - 1);
+		return result;
 	}
 	
-	void getIndexBounds(HitBox hitBox, IntBox bounds) {
-		bounds.l = Arith.floor(-hitBox.getBoundEdgeComp(Dir.L)/cellWidth);
-		bounds.b = Arith.floor(-hitBox.getBoundEdgeComp(Dir.D)/cellWidth);
-		bounds.r = Arith.max(bounds.l, Arith.ceil(hitBox.getBoundEdgeComp(Dir.R)/cellWidth) - 1);
-		bounds.t = Arith.max(bounds.b, Arith.ceil(hitBox.getBoundEdgeComp(Dir.U)/cellWidth) - 1);
-	}
-	
-	double getGridPeriod(HitBox hitBox) {
-		double speed = hitBox.getMaxBoundEdgeVel();
+	double getGridPeriod(HitboxState hitbox) {
+		double speed = hitbox.getMaxEdgeVel();
 		if(speed <= 0.0) return Double.POSITIVE_INFINITY;
 		else return cellWidth/speed;
 	}
 	
 	private void addToCell(HitBox hitBox, int x, int y, int group) {
-		long key = getKey(x, y, group);
+		TileKey key = new TileKey(x, y, group);
 		TightSet<HitBox> set = data.get(key);
 		if(set == null) {
 			set = new TightSet<>();
@@ -88,51 +84,25 @@ final class Field {
 	}
 
 	private void removeFromCell(HitBox hitBox, int x, int y, int group) {
-		long key = getKey(x, y, group);
+		TileKey key = new TileKey(x, y, group);
 		TightSet<HitBox> set = data.get(key);
 		boolean success = set.remove(hitBox);
 		if(!success) throw new RuntimeException();
 		if(set.isEmpty()) data.remove(key);
 		numEntries--;
 	}
-
-	private final static long PRIME = 160481219; //NOTE: PRIME*PRIME*SMALL_PRIME < 2^63
-	private final static long SMALL_PRIME = 263; //NOTE: SMALL_PRIME > HitBox.NUM_GROUPS
-	private final static int MAX_INDEX = (int)(PRIME/2 - 1);
-	
-	private static long getKey(int x, int y, int group) {
-		//this key is used because, at the time of writing, the LongMap in
-		//LibGDX just uses the lower bits of the key as the first hash function
-		if(x > MAX_INDEX || x < -MAX_INDEX) throw new RuntimeException();
-		if(y > MAX_INDEX || y < -MAX_INDEX) throw new RuntimeException();
-		if(group >= SMALL_PRIME || group < 0) throw new RuntimeException();
-		return group + (SMALL_PRIME*x + PRIME*y);
-//		return ((x & 0xFFFF0000L) << 32) | ((y & 0xFFFFFFFFL) << 16) | (x & 0xFFFFL);
-	}
-	
-	private Int2DIterator iterator(IntBox box, IntBox subBox) {
-		if(subBox == null) {
-			boxIter.init(box);
-			return boxIter;
-		}
-		else {
-			diffIter.init(box, subBox);
-			return diffIter;
-		}
-	}
 	
 	private class HitBoxIter implements Iterator<HitBox>, Iterable<HitBox> {
-		private final IntBox.Iterator boxIter = new IntBox.Iterator();
+		private Int2DIterator boxIter;
 		private Iterator<HitBox> cellIter;
 		private int[] groups;
 		private int groupIndex;
 		private HitBox next;
 		private int testId = 0;
 		
-		private void init(IntBox region, int[] groups, int testId) {
-			clear();
+		private HitBoxIter(IntBox region, int[] groups, int testId) {
 			if(groups.length == 0) return;
-			boxIter.init(region);
+			boxIter = region.iterator();
 			if(boxIter.isDone()) return;
 			
 			this.testId = testId;
@@ -161,7 +131,7 @@ final class Field {
 		}
 		
 		private void initCellIter() {
-			long key = getKey(boxIter.getX(), boxIter.getY(), groups[groupIndex]);
+			TileKey key = new TileKey(boxIter.getX(), boxIter.getY(), groups[groupIndex]);
 			TightSet<HitBox> set = data.get(key);
 			if(set == null) cellIter = Collections.<HitBox>emptyList().iterator();
 			else cellIter = set.iterator();

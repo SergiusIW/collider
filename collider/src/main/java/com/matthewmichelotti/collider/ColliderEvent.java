@@ -24,23 +24,21 @@ package com.matthewmichelotti.collider;
 public final class ColliderEvent {
 	private HitBox a, b;
 	private boolean collided;
+
+	public static ColliderEvent newCollide(HitBox a, HitBox b) {
+		return new ColliderEvent(a, b, true);
+	}
+
+	public static ColliderEvent newSeparation(HitBox a, HitBox b) {
+		return new ColliderEvent(a, b, false);
+	}
 	
-	ColliderEvent() {}
-	
-	void init(HitBox a, HitBox b, boolean collided) {
+	ColliderEvent(HitBox a, HitBox b, boolean collided) {
 		if(a == null || b == null) throw new RuntimeException();
 		this.a = a;
 		this.b = b;
 		this.collided = collided;
 	}
-	
-	void clear() {
-		this.a = null;
-		this.b = null;
-	}
-	
-	boolean isInitialized() {return a != null;}
-	boolean involves(HitBox hitBox) {return a == hitBox || b == hitBox;}
 	
 	/**
 	 * Returns the time of the event.

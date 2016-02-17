@@ -26,9 +26,9 @@ public final class HitboxState implements Cloneable {
 	private Vec2d vel;
 	private Shape shape;
 	private Shape shapeVel;
-	private double remainingTime;
-	private int groupId;
-	private boolean interactivityChange;
+	private int group = 0;
+	boolean interactivityChange = true;
+	private double remainingTime = Double.POSITIVE_INFINITY;
 
 	public HitboxState(PlacedShape shape) {
 		this(shape.getPos(), shape.getShape());
@@ -40,7 +40,6 @@ public final class HitboxState implements Cloneable {
 		this.vel = Vec2d.ZERO;
 		this.shape = shape;
 		this.shapeVel = shape.isCircle() ? Shape.ZERO_CIRCLE : Shape.ZERO_RECT;
-		this.remainingTime = Double.POSITIVE_INFINITY;
 	}
 
 	public Vec2d getPos() {
@@ -59,12 +58,8 @@ public final class HitboxState implements Cloneable {
 		return shapeVel;
 	}
 
-	double getRemainingTime() {
-		return remainingTime;
-	}
-
-	public int getGroupId() {
-		return groupId;
+	public int getGroup() {
+		return group;
 	}
 
 	public PlacedShape getPlacedShape() {
@@ -73,6 +68,10 @@ public final class HitboxState implements Cloneable {
 
 	PlacedShape getPlacedShapeVel() {
 		return new PlacedShape(vel, shapeVel);
+	}
+
+	public double getRemainingTime() {
+		return remainingTime;
 	}
 
 	public void setPos(Vec2d pos) {
@@ -95,25 +94,74 @@ public final class HitboxState implements Cloneable {
 		this.shapeVel = shapeVel;
 	}
 
-	public void setRemainingTime(double remainingTime) {
-		this.remainingTime = remainingTime;
+	/**
+	 * Set the group that this HitBox belongs to.
+	 * Default group is 0.
+	 * The value -1 denotes that this HitBox does not belong to any group
+	 * and thus is never tested for collisions.
+	 * This method will also invoke the functionality of
+	 * {@link #interactivityChange()}.
+	 * <p>
+	 * Collision testing will only be performed on HitBoxes of the groups
+	 * specified by the {@link InteractTester#getInteractGroups(HitBox)}
+	 * method.
+	 * This reduces the number of HitBoxes to iterate over for collision checks.
+	 * It is a good idea to use only a small number of groups for a game, perhaps 1 to 3.
+	 * As an example, if you are implementing a
+	 * <a href="http://en.wikipedia.org/wiki/Shoot_'em_up#Bullet_hell_and_niche_appeal">danmaku</a>
+	 * game, you might use one group for bullets and one group for everything else,
+	 * and make it so bullets do not check for collisions within the bullet group.
+	 * @param group Group that this HitBox should belong to.
+	 */
+	public void setGroup(int group) {
+		this.group = group;
+		interactivityChange();
 	}
 
-	public void setGroupId(int groupId) {
-		this.groupId = groupId;
-	}
-
+	/**
+	 * Call this method if there is a change in the return values
+	 * of {@link InteractTester#canInteract(HitBox, HitBox)} involving
+	 * the HitBox.
+	 * This will prompt searching for potential collisions between
+	 * previously uninteractable HitBoxes.
+	 * Separate events will not be generated for HitBoxes that overlap and used
+	 * to interact with each other but no longer do because of this call (
+	 * TODO consider changing this policy?
+	 * )
+	 */
 	public void interactivityChange() {
 		this.interactivityChange = true;
 	}
 
-	HitboxState advance(double timeDelta) {
-		Vec2d newPos = pos.add(vel.scale(timeDelta));
-		Shape newShape = shape.add(shapeVel.scale(timeDelta));
-		HitboxState newState = new HitboxState(newPos, newShape);
-		newState.setVel(vel);
-		newState.setShapeVel(shapeVel);
+	public void setRemainingTime(double remainingTime) {
+		if(remainingTime < 0.0) throw new IllegalArgumentException("remainingTime must be non-negative");
+		this.remainingTime = remainingTime;
+	}
+
+//	HitboxState advance(double timeDelta) {
+//		if(timeDelta == 0.0) return this;
+//		HitboxState newState = this.clone();
+//		newState.setPos(pos.add(vel.scale(timeDelta)));
+//		newState.setShape(shape.add(shapeVel.scale(timeDelta)));
+//		return newState;
+//	}
+
+	HitboxState advance(double originalTime, double newTime) {
+		if(originalTime == newTime) return this;
+		if(originalTime > newTime) throw new IllegalArgumentException();
+		HitboxState newState = this.clone();
+		double delta = newTime - originalTime;
+		newState.setPos(pos.add(vel.scale(delta)));
+		newState.setShape(shape.add(shapeVel.scale(delta)));
+		double endTime = originalTime + remainingTime;
+		if(endTime < newTime) throw new IllegalStateException();
+		newState.remainingTime = endTime - newTime;
 		return newState;
+	}
+
+	void reverseVels() {
+		setVel(getVel().scale(-1.0));
+		setShapeVel(getShapeVel().scale(-1.0));
 	}
 
 	@Override
@@ -123,5 +171,31 @@ public final class HitboxState implements Cloneable {
 		} catch (CloneNotSupportedException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	double getMaxEdgeVel() {
+		PlacedShape vel = getPlacedShapeVel();
+		double result = 0.0;
+		result = Math.max(result, Math.abs(vel.getLeft()));
+		result = Math.max(result, Math.abs(vel.getBottom()));
+		result = Math.max(result, Math.abs(vel.getRight()));
+		result = Math.max(result, Math.abs(vel.getTop()));
+		return result;
+	}
+
+	PlacedShape getBoundingBox() {
+		PlacedShape startShape = getPlacedShape();
+		PlacedShape endShape = startShape.add(getPlacedShapeVel().scale(getRemainingTime()));
+		return ShapeUtil.getBoundingBox(startShape, endShape);
+	}
+
+	boolean isSame(HitboxState o) {
+		if (group != o.group) return false;
+		if (interactivityChange != o.interactivityChange) return false;
+		if (Double.compare(o.remainingTime, remainingTime) != 0) return false;
+		if (!pos.equals(o.pos)) return false;
+		if (!vel.equals(o.vel)) return false;
+		if (!shape.equals(o.shape)) return false;
+		return shapeVel.equals(o.shapeVel);
 	}
 }

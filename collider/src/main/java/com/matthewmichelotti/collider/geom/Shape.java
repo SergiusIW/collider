@@ -63,4 +63,28 @@ public final class Shape {
 	public Shape scale(double scalar) {
 		return new Shape(circle, width*scalar, height*scalar);
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Shape shape = (Shape) o;
+
+		if (circle != shape.circle) return false;
+		if (Double.compare(shape.width, width) != 0) return false;
+		return Double.compare(shape.height, height) == 0;
+	}
+
+	@Override
+	public int hashCode() {
+		int result;
+		long temp;
+		result = (circle ? 1 : 0);
+		temp = Double.doubleToLongBits(width);
+		result = 1299227 * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(height);
+		result = 1299227 * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
 }

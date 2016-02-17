@@ -16,24 +16,34 @@
 
 package com.matthewmichelotti.collider;
 
-final class ECollide extends FunctionEvent {
-	private final HitBox a, b;
-	private final int idA, idB;
-	private final boolean collided;
-	
-	ECollide(HitBox a, HitBox b, double time, boolean collided) {
-		this.a = a;
-		this.b = b;
-		this.idA = a.getChangeId();
-		this.idB = b.getChangeId();
-		this.time = time;
-		this.collided = collided;
+final class TileKey {
+	private final int x;
+	private final int y;
+	private final int group;
+
+	public TileKey(int x, int y, int group) {
+		this.x = x;
+		this.y = y;
+		this.group = group;
 	}
-	
+
 	@Override
-	void resolve(Collider collider) {
-		if(a.getChangeId() == idA && b.getChangeId() == idB) {
-			collider.setCollision(a, b, collided);
-		}
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		TileKey tileKey = (TileKey) o;
+
+		if (x != tileKey.x) return false;
+		if (y != tileKey.y) return false;
+		return group == tileKey.group;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = x;
+		result = 1299227 * result + y;
+		result = 1299227 * result + group;
+		return result;
 	}
 }

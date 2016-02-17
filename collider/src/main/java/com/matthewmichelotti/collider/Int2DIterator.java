@@ -16,6 +16,7 @@
 
 package com.matthewmichelotti.collider;
 
+//TODO use a standard iterator of some Int2d class instead...
 interface Int2DIterator {
 	boolean isDone();
 	void next();

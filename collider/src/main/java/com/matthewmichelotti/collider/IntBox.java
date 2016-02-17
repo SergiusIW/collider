@@ -29,16 +29,21 @@ final class IntBox {
 //		if(bound.b > b) b = bound.b;
 //		if(bound.t < t) t = bound.t;
 //	}
-	
-	static class Iterator implements Int2DIterator {
+
+	Int2DIterator iterator() {
+		return new Iterator(this);
+	}
+
+	Int2DIterator diffIterator(IntBox subBox) {
+		if(subBox == null) return new Iterator(this);
+		else return new DiffIterator(this, subBox);
+	}
+
+	private static class Iterator implements Int2DIterator {
 		private int x, y;
 		private int l, r, t = -1;
-		
-		Iterator() {}
-		
-		Iterator(IntBox box) {init(box);}
-		
-		void init(IntBox box) {
+
+		Iterator(IntBox box) {
 			int b;
 			if(box == null) {l = 0; r = 0; b = 0; t = -1;}
 			else {l = box.l; r = box.r; b = box.b; t = box.t;}
@@ -62,16 +67,12 @@ final class IntBox {
 		@Override public int getY() {return y;}
 	}
 	
-	static class DiffIterator implements Int2DIterator {
+	private static class DiffIterator implements Int2DIterator {
 		private int x, y;
 		private int l, r, t = -1;
 		private int sl, sb, sr, st;
-		
-		DiffIterator() {}
-		
-		DiffIterator(IntBox box, IntBox subBox) {init(box, subBox);}
-		
-		void init(IntBox box, IntBox subBox) {
+
+		DiffIterator(IntBox box, IntBox subBox) {
 			int b;
 			if(box == null) {l = 0; r = 0; b = 0; t = -1;}
 			else {l = box.l; r = box.r; b = box.b; t = box.t;}

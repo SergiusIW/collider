@@ -16,6 +16,10 @@
 
 package com.matthewmichelotti.collider;
 
+import com.matthewmichelotti.collider.geom.PlacedShape;
+
+import java.util.ArrayList;
+
 /**
  * Description of position, shape, and velocities of a hitbox
  * used for testing collision with other HitBoxes.
@@ -29,8 +33,6 @@ package com.matthewmichelotti.collider;
  * for potential interactions.
  * Will wait for all consecutive modifier method calls on a HitBox
  * before performing this check.
- * Whenever you modify the state of a HitBox, you must also call
- * {@link #commit(double)}.
  * <p>
  * For the sake of avoiding numerical instability, the dimensions
  * of a HitBox should never be zero nor extremely small.
@@ -39,205 +41,118 @@ package com.matthewmichelotti.collider;
  * 
  * @author Matthew Michelotti
  */
-public abstract class HitBox {
-	/**
-	 * Number of legal HitBox groups.
-	 * Current value is 256, but it most cases you won't need more than 3 groups.
-	 * Legal groups are 0-255 inclusive.
-	 */
-	public final static int NUM_GROUPS = 256;
-	
-	double startTime, endTime;
-	final Collider collider;
+//TODO fix javadocs
+public final class HitBox {
+	private Collider collider;
 	TightSet<HitBox> overlapSet = new TightSet<>();
+	TightSet<FunctionEvent> events = new TightSet<>();
+	private double startTime;
+	private HitboxState stateAtStartTime;
+	private double internalRemainingTime;
 	
-	private int group = -2;
-	private int changeId = 0;
+	private int group = -1;
 	private int testId = -1;
 	private Object owner;
-
-	HitBox() {
-		this.collider = null;
-	}
 	
-	HitBox(Collider collider) {
+	HitBox(Collider collider, HitboxState intialState, Object owner) {
 		this.collider = collider;
-		this.startTime = collider.getTime();
-		this.endTime = this.startTime;
+		this.owner = owner;
+		changeState(intialState);
+	}
 
-		this.group = -1;
-		setGroup(0);
+	/**
+	 * TODO javadoc
+	 * @return
+	 * @throws IllegalStateException if called after HitBox was deleted,
+	 *         or if remainingTime in HitboxState is negative
+	 */
+	public HitboxState getState() {
+		checkNotDeleted();
+		checkRemainingTime();
+		return stateAtStartTime.advance(startTime, collider.getTime());
 	}
-	
-	void markTransitionStart() {
-		startTime = collider.getTime();
-		if(endTime < startTime) {
-			throw new RuntimeException("updating HitBox late");
-		}
-		changeId++;
-		endTime = -1;
+
+	HitboxState getInternalStateAtStartTime() {
+		HitboxState state = stateAtStartTime.clone();
+		state.setRemainingTime(internalRemainingTime);
+		return state;
 	}
-	
+
+	HitboxState getInternalState() {
+		return getInternalStateAtStartTime().advance(startTime, collider.getTime());
+	}
+
+	void setState(HitboxState state, double internalRemainingTime) {
+		this.startTime = collider.getTime();
+		this.stateAtStartTime = state;
+		this.internalRemainingTime = internalRemainingTime;
+	}
+
 	/**
 	 * Call when done using this HitBox.
 	 * No more events will be generated involving this HitBox.
-	 * This object will be placed uninitialized in a pool
-	 * for future use.
+	 * @throws IllegalStateException if remainingTime in HitboxState is negative
 	 */
-	public void free() {
-		//NOTE: overridden free method should place the HitBox in the appropriate pool
+	public void delete() {
+		checkRemainingTime();
+		if(stateAtStartTime.getGroup() >= 0) {
+			HitboxState newState = getState();
+			newState.setGroup(-1);
+			changeState(newState);
+		}
+		collider = null;
+		overlapSet = null;
+		events = null;
+		stateAtStartTime = null;
 		owner = null;
-		group = -2;
 	}
-	
-	boolean isInitialized() {
-		return group != -2;
+
+	private void checkNotDeleted() {
+		if(collider == null) throw new IllegalStateException("HitBox was deleted");
 	}
-	
-	final boolean testMark(int testId) {
+
+	private void checkRemainingTime() {
+		double endTime = startTime + stateAtStartTime.getRemainingTime();
+		if(endTime < getTime()) throw new IllegalStateException("remaining time for HitboxState is negative");
+	}
+
+	/**
+	 * Updates the state of this HitBox.  This will trigger
+	 * the computation of new collision times with other HitBoxes.
+	 * @param state new state
+	 * @throws IllegalStateException if called after HitBox was deleted,
+	 *         or if remainingTime in original HitboxState is negative
+	 */
+	public void changeState(HitboxState state) {
+		checkNotDeleted();
+		checkRemainingTime();
+		if(!getState().isSame(state)) collider.updateHitbox(this, state);
+	}
+
+	boolean testMark(int testId) {
 		if(testId == this.testId) return false;
 		this.testId = testId;
 		return true;
 	}
 	
-	final int getChangeId() {return changeId;}
-	
 	/**
-	 * Call this method if there is a change in the return values
-	 * of {@link InteractTester#canInteract(HitBox, HitBox)} involving
-	 * this HitBox.
-	 * This will prompt searching for potential collisions between
-	 * previously uninteractable HitBoxes.
-	 * Separate events will not be generated for HitBoxes that overlap and used
-	 * to interact with each other but no longer do because of this call.
+	 * Get the owner Object associated with this HitBox.
+	 * @return object
+	 * @throws IllegalStateException if called after HitBox was deleted
 	 */
-	public final void interactivityChange() {collider.altering(this, true);}
-	
-	/**
-	 * Set the group that this HitBox belongs to.
-	 * Default group is 0.
-	 * The value -1 denotes that this HitBox does not belong to any group
-	 * and thus is never tested for collisions.
-	 * This method will also invoke the functionality of
-	 * {@link #interactivityChange()}.
-	 * <p>
-	 * Collision testing will only be performed on HitBoxes of the groups
-	 * specified by the {@link InteractTester#getInteractGroups(HitBox)}
-	 * method.
-	 * This reduces the number of HitBoxes to iterate over for collision checks.
-	 * It is a good idea to use only a small number of groups for a game, perhaps 1 to 3.
-	 * As an example, if you are implementing a
-	 * <a href="http://en.wikipedia.org/wiki/Shoot_'em_up#Bullet_hell_and_niche_appeal">danmaku</a>
-	 * game, you might use one group for bullets and one group for everything else,
-	 * and make it so bullets do not check for collisions within the bullet group.
-	 * @param group Group that this HitBox should belong to.  Must be between
-	 *   -1 and {@link #NUM_GROUPS}-1 inclusive. The value -1 denotes not belonging to any group.
-	 */
-	public final void setGroup(int group) {
-		if(group < -1 || group >= NUM_GROUPS) {
-			throw new IllegalArgumentException("invalid group:" + group);
-		}
-		collider.altering(this, true);
-		this.group = group;
+	public final Object getOwner() {
+		checkNotDeleted();
+		return owner;
 	}
-	
-	/**
-	 * This should be called after you modify the HitBox by changing
-	 * its position, velocity, interactivity, etc. (exception: this does
-	 * not need to be called after calling {@link #setOwner(Object)}).
-	 * Call this method only once after you have made all of the other
-	 * changes to this HitBox.  You must specify an endTime, which
-	 * is the expected time of the next change to the HitBox state.
-	 * You must call commit again when this endTime is reached, if not sooner.
-	 * Although you are allowed to change the HitBox state and call commit prior
-	 * to the specified endTime, doing so will result in more collisions
-	 * that need to be tested.
-	 * @param endTime Expected time of next change to HitBox state.
-	 * Positive infinity is allowed.
-	 */
-	public final void commit(double endTime) {
-		double time = collider.getTime();
-		if(endTime < time) throw new IllegalArgumentException("endTime already passed");
-		collider.altering(this);
-		this.endTime = endTime;
-	}
-	
-	/**
-	 * Set an object to be associated with this HitBox.
-	 * This is provided as an alternative to looking up
-	 * a related object in a HashMap with HitBoxes as keys.
-	 * @param obj Object to be associated with this HitBox.
-	 */
-	public final void setOwner(Object obj) {this.owner = obj;}
-	
-	/**
-	 * Returns the group that this HitBox belongs to.
-	 * @return The group that this HitBox belongs to.
-	 * @see #setGroup(int)
-	 */
-	public final int getGroup() {return group;}
-	
-	/**
-	 * Returns the Object associated with this HitBox.
-	 * @return The Object associated with this HitBox.
-	 */
-	public final Object getOwner() {return owner;}
 	
 	/**
 	 * Returns the current time of the simulation.
 	 * Same as calling {@link Collider#getTime()}.
 	 * @return The current time of the simulation.
+	 * @throws IllegalStateException if called after HitBox was deleted
 	 */
-	public final double getTime() {return collider.getTime();}
-	
-	/**
-	 * Returns a normal vector between the two HitBoxes.
-	 * Vector will be pointed away from this HitBox and towards the dest HitBox.
-	 * @param dest Other HitBox that normal vector will be pointed towards.
-	 * @return Normal vector between the two HitBoxes.
-	 *   This object will be re-used each time getNormal is called
-	 *   on any HitBox generated from the same Collider.
-	 */
-	public final Normal getNormal(HitBox dest) {
-		return collider.getNormal(this, dest);
-	}
-	
-	/**
-	 * Returns the amount that the two HitBoxes overlap.
-	 * This is the same as the overlap in the return
-	 * value of {@link #getNormal(HitBox)}.
-	 * Due to rounding error, this value may be positive
-	 * even if a collision event was not generated
-	 * for the two HitBoxes, and vice versa.
-	 * @param other Other HitBox to compute overlap of.
-	 * @return The amount that the two HitBoxes overlap.
-	 */
-	public final double getOverlap(HitBox other) {
-		return collider.getNormal(this, other).overlap;
-	}
-
-	
-	/**
-	 * Returns true if the two HitBoxes overlap.
-	 * This is the same as checking if {@link #getOverlap(HitBox)}
-	 * is positive.
-	 * Due to rounding error, this value may be true
-	 * even if a collision event was not generated
-	 * for the two HitBoxes, and vice versa.
-	 * @param other Other HitBox to test overlap with.
-	 * @return True if the two HitBoxes overlap.
-	 */
-	public final boolean overlaps(HitBox other) {
-		return collider.getNormal(this, other).overlap > 0.0;
-	}
-	
-	abstract boolean isMoving();
-	
-	abstract double getBoundEdgeComp(int edge, double startTime, double endTime);
-	
-	abstract double getMaxBoundEdgeVel();
-	
-	final double getBoundEdgeComp(int edge) {
-		return getBoundEdgeComp(edge, startTime, endTime);
+	public final double getTime() {
+		checkNotDeleted();
+		return collider.getTime();
 	}
 }
