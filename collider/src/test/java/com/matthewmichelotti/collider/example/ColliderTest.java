@@ -19,45 +19,41 @@ package com.matthewmichelotti.collider.example;
 import static org.junit.Assert.*;
 
 import com.matthewmichelotti.collider.*;
+import com.matthewmichelotti.collider.geom.PlacedShape;
+import com.matthewmichelotti.collider.geom.Shape;
+import com.matthewmichelotti.collider.geom.Vec2d;
 import org.junit.Test;
 
 public class ColliderTest {
 
 	@Test
 	public void collisionAndSeparationTest() {
-		ColliderOpts opts = new ColliderOpts();
-		opts.cellWidth = 2.0;
-		opts.maxForesightTime = 2.0;
-		opts.separateBuffer = .1;
-		opts.interactTester = new InteractTester() {
+		InteractTester interactTester = new InteractTester() {
 			@Override public boolean canInteract(HitBox a, HitBox b) { return true; }
-			@Override public int[] getInteractGroups(HitBox hitBox) { return new int[] {0}; }
+			@Override public GroupSet getInteractGroups(HitBox hitBox) { return new GroupSet(0); }
 		};
+		Collider collider = new Collider(interactTester, 2.0, .1);
 
-		Collider collider = new Collider(opts);
+		HitboxState state = new HitboxState(new Vec2d(10.0, 0.0), Shape.newRect(2.0, 2.0));
+		state.setVel(new Vec2d(-1.0, 0.0));
+		HitBox rect = collider.newHitbox(state, null);
 
-		HBRect rect = collider.makeRect();
-		rect.setDims(2.0, 2.0);
-		rect.setPos(10.0, 0.0);
-		rect.setVel(-1.0, 0.0);
-		rect.commit(Double.POSITIVE_INFINITY);
+		state = new HitboxState(new Vec2d(0.0, 0.0), Shape.newCircle(2.0));
+		state.setVel(new Vec2d(1.0, 0.0));
+		HitBox circle = collider.newHitbox(state, null);
 
-		HBCircle circle = collider.makeCircle();
-		circle.setDiam(2.0);
-		circle.setPos(0.0, 0.0);
-		circle.setVel(1.0, 0.0);
-		circle.commit(Double.POSITIVE_INFINITY);
-
-		ColliderEvent event = collider.stepToTime(100.0);
+		ColliderEvent event = collider.advance(100.0);
+		if(event.getFirstHitbox() != rect) event = event.swap();
 		assertEquals("unexpected event time", 4.0, event.getTime(), .0001);
-		assertTrue("event should have rect hitbox", event.getFirst() == rect || event.getSecond() == rect);
-		assertTrue("event should have circle hitbox", event.getFirst() == circle || event.getSecond() == circle);
+		assertTrue("event should have rect hitbox", event.getFirstHitbox() == rect);
+		assertTrue("event should have circle hitbox", event.getSecondHitbox() == circle);
 		assertTrue("event should be a collision event", event.isCollision());
 
-		event = collider.stepToTime(100.0);
+		event = collider.advance(100.0);
+		if(event.getFirstHitbox() != rect) event = event.swap();
 		assertEquals("unexpected event time", 6.05, event.getTime(), .0001);
-		assertTrue("event should have rect hitbox", event.getFirst() == rect || event.getSecond() == rect);
-		assertTrue("event should have circle hitbox", event.getFirst() == circle || event.getSecond() == circle);
+		assertTrue("event should have rect hitbox", event.getFirstHitbox() == rect);
+		assertTrue("event should have circle hitbox", event.getSecondHitbox() == circle);
 		assertTrue("event should be a separation event", event.isSeparation());
 	}
 }

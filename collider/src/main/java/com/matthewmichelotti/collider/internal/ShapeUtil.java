@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package com.matthewmichelotti.collider;
+package com.matthewmichelotti.collider.internal;
 
 import com.matthewmichelotti.collider.geom.PlacedShape;
 import com.matthewmichelotti.collider.geom.Shape;
 import com.matthewmichelotti.collider.geom.Vec2d;
+import com.matthewmichelotti.collider.internal.CardDir;
 
-final class ShapeUtil {
+public final class ShapeUtil {
 	private ShapeUtil() {}
 
-	static PlacedShape getBoundingBox(PlacedShape a, PlacedShape b) {
+	public static PlacedShape getBoundingBox(PlacedShape a, PlacedShape b) {
 		double right = Math.max(a.getRight(), b.getRight());
 		double top = Math.max(a.getTop(), b.getTop());
 		double left = Math.min(a.getLeft(), b.getLeft());
@@ -32,7 +33,17 @@ final class ShapeUtil {
 		return new PlacedShape(new Vec2d(left + .5*resultShape.getWidth(), bottom + .5*resultShape.getHeight()), resultShape);
 	}
 
-	static double getEdge(PlacedShape shape, CardDir dir) {
+	public static PlacedShape getBoundingBox(PlacedShape shape) {
+		if(shape.getShape().isRect()) return shape;
+		else return new PlacedShape(shape.getPos(), Shape.newRect(shape.getShape().getWidth(), shape.getShape().getHeight()));
+	}
+
+	public static boolean isZero(Vec2d pos, Shape shape) {
+		return pos.getX() == 0.0 && pos.getY() == 0.0
+				&& shape.getWidth() == 0.0 && shape.getHeight() == 0.0;
+	}
+
+	public static double getEdge(PlacedShape shape, CardDir dir) {
 		switch(dir) {
 			case EAST: return shape.getRight();
 			case NORTH: return shape.getTop();
@@ -42,7 +53,7 @@ final class ShapeUtil {
 		}
 	}
 
-	static double getPos(Vec2d pos, CardDir dir) {
+	public static double getPos(Vec2d pos, CardDir dir) {
 		switch(dir) {
 			case EAST: return pos.getX();
 			case NORTH: return pos.getY();
@@ -52,17 +63,17 @@ final class ShapeUtil {
 		}
 	}
 
-	static double getRectOverlap(PlacedShape a, PlacedShape b, CardDir dir) {
+	public static double getRectOverlap(PlacedShape a, PlacedShape b, CardDir dir) {
 		return getEdge(a, dir) + getEdge(b, dir.reverse());
 	}
 
-	static RectSector getRectSector(PlacedShape shape, Vec2d point) {
+	public static RectSector getRectSector(PlacedShape shape, Vec2d point) {
 		int x = getIntervalSector(shape.getLeft(), shape.getRight(), point.getX());
 		int y = getIntervalSector(shape.getBottom(), shape.getTop(), point.getY());
 		return new RectSector(x, y);
 	}
 
-	static Vec2d getCorner(PlacedShape shape, RectSector sector) {
+	public static Vec2d getCorner(PlacedShape shape, RectSector sector) {
 		if(!sector.isCorner()) throw new IllegalArgumentException();
 		double x = (sector.x == 1) ? shape.getRight() : shape.getLeft();
 		double y = (sector.y == 1) ? shape.getTop() : shape.getBottom();
@@ -75,7 +86,7 @@ final class ShapeUtil {
 		else return 0;
 	}
 
-	static class RectSector {
+	public static class RectSector {
 		private final int x, y;
 
 		private RectSector(int x, int y) {
@@ -85,7 +96,7 @@ final class ShapeUtil {
 			this.y = y;
 		}
 
-		boolean isCorner() {
+		public boolean isCorner() {
 			return x != 0 && y != 0;
 		}
 	}

@@ -17,6 +17,8 @@
 package com.matthewmichelotti.collider;
 
 import com.matthewmichelotti.collider.geom.Shape;
+import com.matthewmichelotti.collider.internal.CardDir;
+import com.matthewmichelotti.collider.internal.ShapeUtil;
 
 final class CollisionTests {
 	private final static double HIGH_TIME = 1e50;
@@ -147,8 +149,8 @@ final class CollisionTests {
 		double baseTime = rectRectTime(rect, circle, false);
 		if(baseTime == 0.0) return 0.0;
 		if(baseTime >= HIGH_TIME) return Double.POSITIVE_INFINITY;
-		rect = rect.advance(0.0, baseTime);
-		circle = circle.advance(0.0, baseTime);
+		rect = rect.advance(0.0, baseTime, true);
+		circle = circle.advance(0.0, baseTime, true);
 		rect.reverseVels();
 		circle.reverseVels();
 		double result = baseTime - rebasedRectCircleCollideTime(rect, circle);

@@ -18,7 +18,7 @@ package com.matthewmichelotti.collider;
 
 /**
  * A collision or seperation event between two HitBoxes.
- * 
+ *
  * @author Matthew Michelotti
  */
 public final class ColliderEvent {
@@ -38,6 +38,10 @@ public final class ColliderEvent {
 		this.a = a;
 		this.b = b;
 		this.collided = collided;
+	}
+
+	public ColliderEvent swap() {
+		return new ColliderEvent(b, a, collided);
 	}
 	
 	/**
@@ -63,13 +67,16 @@ public final class ColliderEvent {
 	 * Returns the first HitBox involved in this event.
 	 * @return The first HitBox involved in this event.
 	 */
-	public HitBox getFirst() {return a;}
+	public HitBox getFirstHitbox() {return a;}
 	
 	/**
 	 * Returns the second HitBox involved in this event.
 	 * @return The second HitBox involved in this event.
 	 */
-	public HitBox getSecond() {return b;}
+	public HitBox getSecondHitbox() {return b;}
+
+	public Object getFirst() {return a.getOwner();}
+	public Object getSecond() {return b.getOwner();}
 	
 	/**
 	 * Given one of the HitBoxes involved in this event, this is a convenience method

@@ -18,7 +18,6 @@ package com.matthewmichelotti.collider.util;
 
 import com.matthewmichelotti.collider.Collider;
 import com.matthewmichelotti.collider.ColliderEvent;
-import com.matthewmichelotti.collider.ColliderOpts;
 
 /**
  * A ContProcess implementation wrapped around a Collider.
@@ -40,15 +39,6 @@ public class ColliderProcess implements ContProcess {
 		this.listener = listener;
 	}
 
-	/**
-	 * Constructs a new ColliderProcess.
-	 * @param opts A new Collider object will be constructed from these options.
-	 * @param listener A listener to handle events from the Collider.
-	 */
-	public ColliderProcess(ColliderOpts opts, ColliderListener listener) {
-		this(new Collider(opts), listener);
-	}
-
 	@Override
 	public double peekNextEventTime() {
 		return collider.peekNextEventTime();
@@ -56,14 +46,14 @@ public class ColliderProcess implements ContProcess {
 
 	@Override
 	public void stepToTime(double time) {
-		ColliderEvent evt = collider.stepToTime(time, false);
+		ColliderEvent evt = collider.advance(time, false);
 		if(evt != null) throw new RuntimeException();
 	}
 
 	@Override
 	public void resolveEvent() {
 		double time = collider.getTime();
-		ColliderEvent evt = collider.stepToTime(time);
+		ColliderEvent evt = collider.advance(time);
 		if(evt != null) {
 			if(evt.isCollision()) listener.collision(evt);
 			else if(evt.isSeparation()) listener.separation(evt);

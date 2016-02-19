@@ -58,5 +58,5 @@ public interface InteractTester {
 	 * Returning null will be treated the same as returning an empty array
 	 * @see HitBox#setGroup(int)
 	 */
-	public int[] getInteractGroups(HitBox hitBox);
+	public GroupSet getInteractGroups(HitBox hitBox);
 }

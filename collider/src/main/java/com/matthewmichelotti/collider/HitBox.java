@@ -17,6 +17,8 @@
 package com.matthewmichelotti.collider;
 
 import com.matthewmichelotti.collider.geom.PlacedShape;
+import com.matthewmichelotti.collider.geom.Shape;
+import com.matthewmichelotti.collider.geom.Vec2d;
 
 import java.util.ArrayList;
 
@@ -43,14 +45,20 @@ import java.util.ArrayList;
  */
 //TODO fix javadocs
 public final class HitBox {
+	private final static HitboxState DEFAULT_STATE;
+
+	static {
+		DEFAULT_STATE = new HitboxState(new Vec2d(0.0, 0.0), Shape.newCircle(1.0));
+		DEFAULT_STATE.setGroup(-1);
+	}
+
 	private Collider collider;
 	TightSet<HitBox> overlapSet = new TightSet<>();
 	TightSet<FunctionEvent> events = new TightSet<>();
-	private double startTime;
-	private HitboxState stateAtStartTime;
-	private double internalRemainingTime;
-	
-	private int group = -1;
+	private double startTime = 0.0;
+	private HitboxState stateAtStartTime = DEFAULT_STATE;
+	private double internalRemainingTime = Double.POSITIVE_INFINITY;
+
 	private int testId = -1;
 	private Object owner;
 	
@@ -84,7 +92,8 @@ public final class HitBox {
 
 	void setState(HitboxState state, double internalRemainingTime) {
 		this.startTime = collider.getTime();
-		this.stateAtStartTime = state;
+		this.stateAtStartTime = state.clone();
+        this.stateAtStartTime.clearInteractivityChange();
 		this.internalRemainingTime = internalRemainingTime;
 	}
 

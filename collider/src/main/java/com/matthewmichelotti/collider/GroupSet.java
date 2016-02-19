@@ -16,16 +16,14 @@
 
 package com.matthewmichelotti.collider;
 
-enum CardDir {
-	EAST, NORTH, SOUTH, WEST;
+import java.util.Arrays;
 
-	public CardDir reverse() {
-		switch(this) {
-			case EAST: return WEST;
-			case WEST: return EAST;
-			case NORTH: return SOUTH;
-			case SOUTH: return NORTH;
-			default: throw new RuntimeException();
-		}
+//TODO javadoc
+public class GroupSet {
+	final int[] array;
+
+	public GroupSet(int... set) {
+		//TODO check for no repeats & no negatives...
+		this.array = Arrays.copyOf(set, set.length);
 	}
 }

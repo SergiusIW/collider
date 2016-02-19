@@ -19,6 +19,7 @@ package com.matthewmichelotti.collider;
 import com.matthewmichelotti.collider.geom.PlacedShape;
 import com.matthewmichelotti.collider.geom.Shape;
 import com.matthewmichelotti.collider.geom.Vec2d;
+import com.matthewmichelotti.collider.internal.ShapeUtil;
 
 //TODO javadoc
 public final class HitboxState implements Cloneable {
@@ -133,6 +134,10 @@ public final class HitboxState implements Cloneable {
 		this.interactivityChange = true;
 	}
 
+	void clearInteractivityChange() {
+		this.interactivityChange = false;
+	}
+
 	public void setRemainingTime(double remainingTime) {
 		if(remainingTime < 0.0) throw new IllegalArgumentException("remainingTime must be non-negative");
 		this.remainingTime = remainingTime;
@@ -147,6 +152,10 @@ public final class HitboxState implements Cloneable {
 //	}
 
 	HitboxState advance(double originalTime, double newTime) {
+		return advance(originalTime, newTime, false);
+	}
+
+	HitboxState advance(double originalTime, double newTime, boolean allowRemainingTimeOverflow) {
 		if(originalTime == newTime) return this;
 		if(originalTime > newTime) throw new IllegalArgumentException();
 		HitboxState newState = this.clone();
@@ -154,8 +163,9 @@ public final class HitboxState implements Cloneable {
 		newState.setPos(pos.add(vel.scale(delta)));
 		newState.setShape(shape.add(shapeVel.scale(delta)));
 		double endTime = originalTime + remainingTime;
-		if(endTime < newTime) throw new IllegalStateException();
+		if(!allowRemainingTimeOverflow && endTime < newTime) throw new IllegalStateException();
 		newState.remainingTime = endTime - newTime;
+		if(newState.remainingTime < 0.0) newState.remainingTime = 0.0;
 		return newState;
 	}
 
@@ -185,6 +195,7 @@ public final class HitboxState implements Cloneable {
 
 	PlacedShape getBoundingBox() {
 		PlacedShape startShape = getPlacedShape();
+		if(ShapeUtil.isZero(vel, shapeVel)) return ShapeUtil.getBoundingBox(startShape);
 		PlacedShape endShape = startShape.add(getPlacedShapeVel().scale(getRemainingTime()));
 		return ShapeUtil.getBoundingBox(startShape, endShape);
 	}

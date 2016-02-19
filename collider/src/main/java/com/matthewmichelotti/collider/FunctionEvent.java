@@ -25,6 +25,8 @@ abstract class FunctionEvent implements Comparable<FunctionEvent> {
 	FunctionEvent(double time, int id, HitBox first, HitBox second) {
 		this.time = time;
 		this.id = id;
+		this.first = first;
+		this.second = second;
 	}
 
 	double getTime() {

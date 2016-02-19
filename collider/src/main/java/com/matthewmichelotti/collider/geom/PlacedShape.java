@@ -36,13 +36,11 @@ public final class PlacedShape {
 	}
 
 	public DirVec2d normalFrom(PlacedShape other) {
-		//TODO implement
-		throw new RuntimeException("not implemented");
+		return OverlapTests.normalFrom(this, other);
 	}
 
 	public boolean overlaps(PlacedShape other) {
-		//TODO implement
-		throw new RuntimeException("not implemented");
+		return OverlapTests.overlaps(this, other);
 	}
 
 	public PlacedShape add(PlacedShape delta) {

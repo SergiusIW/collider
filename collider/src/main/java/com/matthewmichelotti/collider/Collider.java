@@ -197,7 +197,8 @@ public final class Collider {
 		hitbox.setState(newStatePublic, newState.getRemainingTime());
 
 		if(newState.getGroup() >= 0) {
-			for(HitBox otherHitbox : field.iterator(newBounds, interactTester.getInteractGroups(hitbox), testId)) {
+			for(HitBox otherHitbox : field.iterator(newBounds, interactTester.getInteractGroups(hitbox).array, testId)) {
+				if(hitbox == otherHitbox) continue;
 				if(hitbox.overlapSet.contains(otherHitbox)) continue;
 				if(!interactTester.canInteract(hitbox, otherHitbox)) continue;
 				collisionCheck(hitbox, otherHitbox);
@@ -212,7 +213,7 @@ public final class Collider {
 			}
 
 			if(newState.getRemainingTime() != newStatePublic.getRemainingTime()) {
-				queueFunctionEvent(new FunctionEvent(newState.getRemainingTime(), nextEventId++, hitbox, null) {
+				queueFunctionEvent(new FunctionEvent(getTime() + newState.getRemainingTime(), nextEventId++, hitbox, null) {
 					@Override ColliderEvent resolve(Collider collider) {
 						updateHitbox(hitbox, hitbox.getState());
 						return null;
@@ -225,9 +226,10 @@ public final class Collider {
 	}
 
 	private void collisionCheck(final HitBox a, final HitBox b) {
+		if(a == b) throw new IllegalStateException();
 		double collideTime = CollisionTests.collideTime(a.getInternalState(), b.getInternalState());
 		if(collideTime == Double.POSITIVE_INFINITY) return;
-		queueFunctionEvent(new FunctionEvent(collideTime, nextEventId++, a, b) {
+		queueFunctionEvent(new FunctionEvent(getTime() + collideTime, nextEventId++, a, b) {
 			@Override ColliderEvent resolve(Collider collider) {
 				boolean success = a.overlapSet.add(b);
 				success &= b.overlapSet.add(a);
@@ -239,9 +241,10 @@ public final class Collider {
 	}
 
 	private void separationCheck(final HitBox a, final HitBox b) {
+		if(a == b) throw new IllegalStateException();
 		double separateTime = CollisionTests.separateTime(a.getInternalState(), b.getInternalState(), separateBuffer);
 		if(separateTime == Double.POSITIVE_INFINITY) return;
-		queueFunctionEvent(new FunctionEvent(separateTime, nextEventId++, a, b) {
+		queueFunctionEvent(new FunctionEvent(getTime() + separateTime, nextEventId++, a, b) {
 			@Override ColliderEvent resolve(Collider collider) {
 				boolean success = a.overlapSet.remove(b);
 				success &= b.overlapSet.remove(a);
