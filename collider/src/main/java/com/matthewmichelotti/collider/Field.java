@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 final class Field {
-	private HashMap<TileKey, TightSet<HitBox>> data;
+	private HashMap<TileKey, TightSet<Hitbox>> data;
 	private double cellWidth;
 	private int numEntries = 0;
 	
@@ -36,22 +36,22 @@ final class Field {
 	
 	int getNumEntries() {return numEntries;}
 	
-	void remove(HitBox hitBox, int group, IntBox oldBox, IntBox newBox) {
+	void remove(Hitbox hitbox, int group, IntBox oldBox, IntBox newBox) {
 		if(group < 0) return;
 		for(Int2DIterator iter = oldBox.diffIterator(newBox); !iter.isDone(); iter.next()) {
-			removeFromCell(hitBox, iter.getX(), iter.getY(), group);
+			removeFromCell(hitbox, iter.getX(), iter.getY(), group);
 		}
 	}
 
-	void add(HitBox hitBox, int group, IntBox oldBox, IntBox newBox) {
+	void add(Hitbox hitbox, int group, IntBox oldBox, IntBox newBox) {
 		if(group < 0) return;
 		for(Int2DIterator iter = newBox.diffIterator(oldBox); !iter.isDone(); iter.next()) {
-			addToCell(hitBox, iter.getX(), iter.getY(), group);
+			addToCell(hitbox, iter.getX(), iter.getY(), group);
 		}
 	}
 
 	//NOTE: should iterate to completion
-	Iterable<HitBox> iterator(IntBox region, int[] groups, int testId) {
+	Iterable<Hitbox> iterator(IntBox region, int[] groups, int testId) {
 		return new HitBoxIter(region, groups, testId);
 	}
 
@@ -71,33 +71,33 @@ final class Field {
 		else return cellWidth/speed;
 	}
 	
-	private void addToCell(HitBox hitBox, int x, int y, int group) {
+	private void addToCell(Hitbox hitbox, int x, int y, int group) {
 		TileKey key = new TileKey(x, y, group);
-		TightSet<HitBox> set = data.get(key);
+		TightSet<Hitbox> set = data.get(key);
 		if(set == null) {
 			set = new TightSet<>();
 			data.put(key, set);
 		}
-		boolean success = set.add(hitBox);
+		boolean success = set.add(hitbox);
 		if(!success) throw new RuntimeException();
 		numEntries++;
 	}
 
-	private void removeFromCell(HitBox hitBox, int x, int y, int group) {
+	private void removeFromCell(Hitbox hitbox, int x, int y, int group) {
 		TileKey key = new TileKey(x, y, group);
-		TightSet<HitBox> set = data.get(key);
-		boolean success = set.remove(hitBox);
+		TightSet<Hitbox> set = data.get(key);
+		boolean success = set.remove(hitbox);
 		if(!success) throw new RuntimeException();
 		if(set.isEmpty()) data.remove(key);
 		numEntries--;
 	}
 	
-	private class HitBoxIter implements Iterator<HitBox>, Iterable<HitBox> {
+	private class HitBoxIter implements Iterator<Hitbox>, Iterable<Hitbox> {
 		private Int2DIterator boxIter;
-		private Iterator<HitBox> cellIter;
+		private Iterator<Hitbox> cellIter;
 		private int[] groups;
 		private int groupIndex;
-		private HitBox next;
+		private Hitbox next;
 		private int testId = 0;
 		
 		private HitBoxIter(IntBox region, int[] groups, int testId) {
@@ -132,8 +132,8 @@ final class Field {
 		
 		private void initCellIter() {
 			TileKey key = new TileKey(boxIter.getX(), boxIter.getY(), groups[groupIndex]);
-			TightSet<HitBox> set = data.get(key);
-			if(set == null) cellIter = Collections.<HitBox>emptyList().iterator();
+			TightSet<Hitbox> set = data.get(key);
+			if(set == null) cellIter = Collections.<Hitbox>emptyList().iterator();
 			else cellIter = set.iterator();
 		}
 		
@@ -145,14 +145,14 @@ final class Field {
 		}
 		
 		@Override
-		public HitBox next() {
+		public Hitbox next() {
 			if(next == null) throw new NoSuchElementException();
-			HitBox result = next;
+			Hitbox result = next;
 			searchNext();
 			return result;
 		}
 		
-		@Override public Iterator<HitBox> iterator() {return this;}
+		@Override public Iterator<Hitbox> iterator() {return this;}
 		@Override public boolean hasNext() {return next != null;}
 		@Override public void remove() {throw new UnsupportedOperationException();}
 	}

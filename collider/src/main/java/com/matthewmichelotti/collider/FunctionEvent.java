@@ -19,10 +19,10 @@ package com.matthewmichelotti.collider;
 abstract class FunctionEvent implements Comparable<FunctionEvent> {
 	private final double time;
 	private final int id;
-	private HitBox first;
-	private HitBox second;
+	private Hitbox first;
+	private Hitbox second;
 	
-	FunctionEvent(double time, int id, HitBox first, HitBox second) {
+	FunctionEvent(double time, int id, Hitbox first, Hitbox second) {
 		this.time = time;
 		this.id = id;
 		this.first = first;
@@ -44,15 +44,15 @@ abstract class FunctionEvent implements Comparable<FunctionEvent> {
 		return second != null;
 	}
 
-	HitBox getFirst() {
+	Hitbox getFirst() {
 		return first;
 	}
 
-	HitBox getSecond() {
+	Hitbox getSecond() {
 		return second;
 	}
 
-	HitBox getOther(HitBox hitbox) {
+	Hitbox getOther(Hitbox hitbox) {
 		if(hitbox == first) return second;
 		if(hitbox == second) return first;
 		throw new IllegalArgumentException();

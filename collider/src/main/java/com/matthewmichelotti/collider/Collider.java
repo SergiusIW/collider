@@ -16,9 +16,8 @@
 
 package com.matthewmichelotti.collider;
 
-import java.util.ArrayList;
-import java.util.PriorityQueue;
-import java.util.TreeMap;
+import com.matthewmichelotti.collider.processes.FlowProcess;
+
 import java.util.TreeSet;
 
 /**
@@ -30,7 +29,7 @@ import java.util.TreeSet;
  * Also tracks when two overlapping HitBoxes separate.
  * 
  * @see ColliderOpts
- * @see HitBox
+ * @see Hitbox
  * @author Matthew Michelotti
  */
 //TODO fix javadocs
@@ -43,7 +42,8 @@ public final class Collider {
 
 	private int nextEventId = 0;
 	private int testId = 0;
-	
+
+	//TODO track hitBoxesInUse and numOverlaps...
 	private int hitBoxesInUse = 0;
 	private int numOverlaps = 0;
 
@@ -74,13 +74,13 @@ public final class Collider {
 	}
 
 	/**
-	 * Constructs a new HitBox to be used with this Collider.
+	 * Constructs a new Hitbox to be used with this Collider.
 	 * @param state initial state of the hitbox
 	 * @param owner the owner object to be associated with the hitbox
 	 * @return a new hitbox
 	 */
-	public HitBox newHitbox(HitboxState state, Object owner) {
-		return new HitBox(this, state, owner);
+	public Hitbox newHitbox(HitboxState state, Object owner) {
+		return new Hitbox(this, state, owner);
 	}
 	
 	/**
@@ -89,7 +89,7 @@ public final class Collider {
 	 * @param newTime Advances simulation to this time
 	 *   (unless a collision/separation occurs earlier).
 	 * @return A description of the collision/separation, or null if no collision/separation occurred.
-	 *   This object will be reused whenever stepToTime is called.
+	 *   This object will be reused whenever advance is called.
 	 */
 	public ColliderEvent advance(double maxTime) {
 		return advance(maxTime, true);
@@ -110,7 +110,7 @@ public final class Collider {
 	 *   (unless a collision/separation occurs earlier).
 	 * @param inclusive If true, this method may return an event that occurs precisely at newTime.
 	 * @return A description of the collision/separation, or null if no collision/separation occurred.
-	 *   This object will be reused whenever stepToTime is called.
+	 *   This object will be reused whenever advance is called.
 	 */
 	public ColliderEvent advance(double maxTime, boolean inclusive) {
 		if(maxTime < time) throw new IllegalArgumentException();
@@ -143,12 +143,12 @@ public final class Collider {
 	 * events for this Collider.
 	 * This is useful
 	 * for coupling the Collider with other continuous-time processes.
-	 * Calling {@link #stepToTime(double)} with <code>peekNextEventTime()</code>
+	 * Calling {@link #stepToTime(double)} with <code>peekNextTime()</code>
 	 * as the newTime will not necessarily return an
 	 * event, because it may just process an internal event.
 	 * @return Time of next event in priority queue, or positive infinity if
 	 *   there are no events.
-	 * @see com.matthewmichelotti.collider.util.ContProcess
+	 * @see FlowProcess
 	 */
 	public double peekNextEventTime() {
 		FunctionEvent evt = peekQueue();
@@ -175,16 +175,16 @@ public final class Collider {
 		System.out.println("-----------------------------");
 	}
 
-	void updateHitbox(final HitBox hitbox, HitboxState newStatePublic) {
+	void updateHitbox(final Hitbox hitbox, HitboxState newStatePublic) {
 		clearRelatedEvents(hitbox);
 		testId++;
 
 		HitboxState oldState = hitbox.getInternalStateAtStartTime();
-		IntBox oldBounds = field.getIndexBounds(oldState);
+		IntBox oldBounds = oldState.getGroup() >= 0 ? field.getIndexBounds(oldState) : null;
 
 		HitboxState newState = newStatePublic.clone();
 		if(newState.getGroup() >= 0) newState.setRemainingTime(Math.min(newState.getRemainingTime(), field.getGridPeriod(newState)));
-		IntBox newBounds = field.getIndexBounds(newState);
+		IntBox newBounds = newState.getGroup() >= 0 ? field.getIndexBounds(newState) : null;
 
 		if(oldState.getGroup() == newState.getGroup()) {
 			field.remove(hitbox, oldState.getGroup(), oldBounds, newBounds);
@@ -197,16 +197,17 @@ public final class Collider {
 		hitbox.setState(newStatePublic, newState.getRemainingTime());
 
 		if(newState.getGroup() >= 0) {
-			for(HitBox otherHitbox : field.iterator(newBounds, interactTester.getInteractGroups(hitbox).array, testId)) {
+			for(Hitbox otherHitbox : field.iterator(newBounds, interactTester.getInteractGroups(hitbox).array, testId)) {
 				if(hitbox == otherHitbox) continue;
 				if(hitbox.overlapSet.contains(otherHitbox)) continue;
 				if(!interactTester.canInteract(hitbox, otherHitbox)) continue;
 				collisionCheck(hitbox, otherHitbox);
 			}
 
-			for(HitBox otherHitbox : newStatePublic.interactivityChange ? hitbox.overlapSet.valuesToList() : hitbox.overlapSet) {
+			for(Hitbox otherHitbox : newStatePublic.interactivityChange ? hitbox.overlapSet.valuesToList() : hitbox.overlapSet) {
 				if(newStatePublic.interactivityChange && !interactTester.canInteract(hitbox, otherHitbox)) {
 					hitbox.overlapSet.remove(otherHitbox);
+					otherHitbox.overlapSet.remove(hitbox);
 				} else {
 					separationCheck(hitbox, otherHitbox);
 				}
@@ -221,11 +222,14 @@ public final class Collider {
 				});
 			}
 		} else {
+			for(Hitbox otherHitbox : hitbox.overlapSet) {
+				otherHitbox.overlapSet.remove(hitbox);
+			}
 			hitbox.overlapSet.clear();
 		}
 	}
 
-	private void collisionCheck(final HitBox a, final HitBox b) {
+	private void collisionCheck(final Hitbox a, final Hitbox b) {
 		if(a == b) throw new IllegalStateException();
 		double collideTime = CollisionTests.collideTime(a.getInternalState(), b.getInternalState());
 		if(collideTime == Double.POSITIVE_INFINITY) return;
@@ -240,7 +244,7 @@ public final class Collider {
 		});
 	}
 
-	private void separationCheck(final HitBox a, final HitBox b) {
+	private void separationCheck(final Hitbox a, final Hitbox b) {
 		if(a == b) throw new IllegalStateException();
 		double separateTime = CollisionTests.separateTime(a.getInternalState(), b.getInternalState(), separateBuffer);
 		if(separateTime == Double.POSITIVE_INFINITY) return;
@@ -261,7 +265,7 @@ public final class Collider {
 		if(event.isPairEvent()) event.getSecond().events.add(event);
 	}
 
-	private void clearRelatedEvents(HitBox hitbox) {
+	private void clearRelatedEvents(Hitbox hitbox) {
 		for(FunctionEvent event : hitbox.events) {
 			queue.remove(event);
 			if(event.isPairEvent()) event.getOther(hitbox).events.remove(event);

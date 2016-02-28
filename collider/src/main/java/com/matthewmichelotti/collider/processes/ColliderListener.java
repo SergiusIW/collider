@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.matthewmichelotti.collider.util;
+package com.matthewmichelotti.collider.processes;
 
 import com.matthewmichelotti.collider.ColliderEvent;
 
@@ -23,7 +23,6 @@ import com.matthewmichelotti.collider.ColliderEvent;
  * a {@link com.matthewmichelotti.collider.Collider}.
  *
  * @see ColliderProcess
- * @author Matthew Michelotti
  */
 public interface ColliderListener {
 

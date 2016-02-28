@@ -22,12 +22,14 @@ import com.matthewmichelotti.collider.internal.ShapeUtil;
 final class OverlapTests {
 	private OverlapTests() {}
 
+	//FIXME implement normalFrom for circle-circle and circle-rect
 	static DirVec2d normalFrom(PlacedShape a, PlacedShape b) {
 		if(a.getShape().isRect()) {
 			if(b.getShape().isRect()) return rectRectNormal(a, b);
-			else throw new RuntimeException("not implemented");
+			else return rectCircleNormal(a, b);
 		} else {
-			throw new RuntimeException("not implemented");
+			if(b.getShape().isRect()) return rectCircleNormal(b, a).flip();
+			else return circleCircleNormal(a, b);
 		}
 	}
 
@@ -47,5 +49,22 @@ final class OverlapTests {
 			}
 		}
 		return new DirVec2d(minDir.asVec(), overlap);
+	}
+
+	private static DirVec2d circleCircleNormal(PlacedShape dst, PlacedShape src) {
+		Vec2d dir = dst.getPos().sub(src.getPos());
+		double dist = dir.getLength();
+		if(dist == 0.0) dir = new Vec2d(1.0, 0.0);
+		return new DirVec2d(dir, .5*(dst.getShape().getWidth() + src.getShape().getWidth()) - dist);
+	}
+
+	private static DirVec2d rectCircleNormal(PlacedShape dst, PlacedShape src) {
+		ShapeUtil.RectSector sector = ShapeUtil.getRectSector(dst, src.getPos());
+		if(sector.isCorner()) {
+			PlacedShape corner = new PlacedShape(ShapeUtil.getCorner(dst, sector), Shape.ZERO_CIRCLE);
+			return circleCircleNormal(corner, src);
+		} else {
+			return rectRectNormal(dst, src);
+		}
 	}
 }

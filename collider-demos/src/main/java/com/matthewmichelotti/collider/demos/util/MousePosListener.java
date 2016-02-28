@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package com.matthewmichelotti.collider.demos;
+package com.matthewmichelotti.collider.demos.util;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.matthewmichelotti.collider.geom.Vec2d;
 
-public class Main {
-	public static void main(String[] args) {
-		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
-		cfg.title = "collider-demos";
-		cfg.width = 1280;
-		cfg.height = 720;
-		
-		new LwjglApplication(new Demos(), cfg);
-	}
+/**
+ * An interface for listening for mouse positions.
+ */
+public interface MousePosListener {
+	void updateMousePos(Vec2d pos, double endTime);
 }

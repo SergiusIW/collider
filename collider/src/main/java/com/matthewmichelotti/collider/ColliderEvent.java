@@ -22,18 +22,18 @@ package com.matthewmichelotti.collider;
  * @author Matthew Michelotti
  */
 public final class ColliderEvent {
-	private HitBox a, b;
+	private Hitbox a, b;
 	private boolean collided;
 
-	public static ColliderEvent newCollide(HitBox a, HitBox b) {
+	public static ColliderEvent newCollide(Hitbox a, Hitbox b) {
 		return new ColliderEvent(a, b, true);
 	}
 
-	public static ColliderEvent newSeparation(HitBox a, HitBox b) {
+	public static ColliderEvent newSeparation(Hitbox a, Hitbox b) {
 		return new ColliderEvent(a, b, false);
 	}
 	
-	ColliderEvent(HitBox a, HitBox b, boolean collided) {
+	ColliderEvent(Hitbox a, Hitbox b, boolean collided) {
 		if(a == null || b == null) throw new RuntimeException();
 		this.a = a;
 		this.b = b;
@@ -64,30 +64,30 @@ public final class ColliderEvent {
 	public boolean isSeparation() {return !collided;}
 	
 	/**
-	 * Returns the first HitBox involved in this event.
-	 * @return The first HitBox involved in this event.
+	 * Returns the first Hitbox involved in this event.
+	 * @return The first Hitbox involved in this event.
 	 */
-	public HitBox getFirstHitbox() {return a;}
+	public Hitbox getFirstHitbox() {return a;}
 	
 	/**
-	 * Returns the second HitBox involved in this event.
-	 * @return The second HitBox involved in this event.
+	 * Returns the second Hitbox involved in this event.
+	 * @return The second Hitbox involved in this event.
 	 */
-	public HitBox getSecondHitbox() {return b;}
+	public Hitbox getSecondHitbox() {return b;}
 
 	public Object getFirst() {return a.getOwner();}
 	public Object getSecond() {return b.getOwner();}
 	
 	/**
 	 * Given one of the HitBoxes involved in this event, this is a convenience method
-	 * for obtaining the other involved HitBox.
-	 * Like using <code>(hitBox == getFirst()) ? getSecond() : getFirst()</code>.
-	 * @param hitBox One of the HitBoxes involved in this event.
-	 * @return The other HitBox involved in this event.
+	 * for obtaining the other involved Hitbox.
+	 * Like using <code>(hitbox == getFirst()) ? getSecond() : getFirst()</code>.
+	 * @param hitbox One of the HitBoxes involved in this event.
+	 * @return The other Hitbox involved in this event.
 	 */
-	public HitBox getOther(HitBox hitBox) {
-		if(a == hitBox) return b;
-		else if(b == hitBox) return a;
+	public Hitbox getOther(Hitbox hitbox) {
+		if(a == hitbox) return b;
+		else if(b == hitbox) return a;
 		else throw new IllegalArgumentException();
 	}
 }

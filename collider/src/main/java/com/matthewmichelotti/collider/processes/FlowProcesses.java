@@ -14,48 +14,29 @@
  * limitations under the License.
  */
 
-package com.matthewmichelotti.collider.util;
+package com.matthewmichelotti.collider.processes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * Couples multiple {@link ContProcess} objects together
+ * Couples multiple {@link FlowProcess} objects together
  * to handle their respective events in chronological order.
- *
- * @author Matthew Michelotti
  */
-public class ContProcesses {
-	private ArrayList<ContProcess> processes = new ArrayList<ContProcess>();
+public class FlowProcesses {
+	private List<FlowProcess> processes;
 	private double time = 0.0;
 
 	/**
-	 * Constructs a new ContProcesses object.  Time is initialized to zero.
+	 * Constructs a new FlowProcesses object.  Time is initialized to zero.
+	 * @param processes list of processes to use
 	 */
-	public ContProcesses() {}
-
-	/**
-	 * Adds a new continuous-time process.  The {@link ContProcess#stepToTime(double)} method
-	 * is called to advance the process to the current time of this object.  No events should be scheduled
-	 * before this time.
-	 * @param process The new continuous-time process to add.
-	 * @return True iff the process was not already in this collection.
-	 */
-	public boolean addProcess(ContProcess process) {
-		if(processes.indexOf(process) >= 0) return false;
-		double nextEventTime = process.peekNextEventTime();
-		if(nextEventTime < time) throw new RuntimeException("process event time has already passed");
-		process.stepToTime(time);
-		processes.add(process);
-		return true;
-	}
-
-	/**
-	 * Removes a process.  Methods of the given process will no longer be invoked.
-	 * @param process The process to remove.
-	 * @return True iff the process was found.
-	 */
-	public boolean removeProcess(ContProcess process) {
-		return processes.remove(process);
+	public FlowProcesses(FlowProcess... processes) {
+		this.processes = Arrays.asList(processes);
+		for(FlowProcess process : this.processes) {
+			process.advance(0.0);
+		}
 	}
 
 	/**
@@ -73,13 +54,13 @@ public class ContProcesses {
 	 * the process that was added first will be resolved first.
 	 * @param newTime Time to advance the processes to.
 	 */
-	public void stepToTime(double newTime) {
+	public void advance(double newTime) {
 		if(newTime < time) throw new RuntimeException();
 		while(true) {
 			double minEvtTime = newTime;
 			int minEvtTimeI = -1;
 			for(int i = 0; i < processes.size(); i++) {
-				double evtTime = processes.get(i).peekNextEventTime();
+				double evtTime = processes.get(i).peekNextTime();
 				if(evtTime < time) throw new RuntimeException();
 				if(evtTime < minEvtTime) {
 					minEvtTime = evtTime;
@@ -88,12 +69,12 @@ public class ContProcesses {
 			}
 			if(minEvtTime != time) {
 				for(int i = 0; i < processes.size(); i++) {
-					processes.get(i).stepToTime(minEvtTime);
+					processes.get(i).advance(minEvtTime);
 				}
 			}
 			this.time = minEvtTime;
 			if(minEvtTimeI < 0) break;
-			processes.get(minEvtTimeI).resolveEvent();
+			processes.get(minEvtTimeI).resolveNext();
 		}
 	}
 }

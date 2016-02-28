@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-package com.matthewmichelotti.collider.demos;
+package com.matthewmichelotti.collider.demos.util;
 
-/**
- * An interface for listening for mouse positions.
- * @author Matthew Michelotti
- */
-public interface MousePosListener {
-	public void updateMousePos(double endTime, double mouseX, double mouseY);
+public interface VoidFunction {
+	void invoke();
 }

@@ -14,34 +14,33 @@
  * limitations under the License.
  */
 
-package com.matthewmichelotti.collider.util;
+package com.matthewmichelotti.collider.processes;
 
 /**
  * A continuous-time process. This can be used to couple Collider
  * with other continuous-time processes that the user creates.
  *
- * @see ContProcesses
- * @author Matthew Michelotti
+ * @see FlowProcesses
  */
-public interface ContProcess {
+public interface FlowProcess {
 	/**
 	 * Returns the time that the next event will occur in this process.
 	 * Assumes no other processes have an event before that time.
 	 * @return The time of the next event.
 	 */
-	public double peekNextEventTime();
+	public double peekNextTime();
 
 	/**
 	 * Advances this process to the given time, without resolving
 	 * any events at that time.  No events should occur before
 	 * this time either.
 	 * @param time Time to advance the process to.  This must be
-	 * at most {@link #peekNextEventTime()}.
+	 * at most {@link #peekNextTime()}.
 	 */
-	public void stepToTime(double time);
+	public void advance(double time);
 
 	/**
 	 * Resolve an event that occurs at the current time.
 	 */
-	public void resolveEvent();
+	public void resolveNext();
 }

@@ -38,6 +38,10 @@ public final class DirVec2d {
 		return new Vec2d(direction.getX()*length, direction.getY()*length);
 	}
 
+	public DirVec2d flip() {
+		return new DirVec2d(direction.flip(), length);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

@@ -55,12 +55,20 @@ public final class Vec2d {
 		return Math.sqrt(this.distanceSq(other));
 	}
 
-	public Vec2d add(Vec2d delta) {
-		return new Vec2d(x + delta.x, y + delta.y);
+	public Vec2d add(Vec2d rhs) {
+		return new Vec2d(x + rhs.x, y + rhs.y);
+	}
+
+	public Vec2d sub(Vec2d rhs) {
+		return new Vec2d(x - rhs.x, y - rhs.y);
 	}
 
 	public Vec2d scale(double scalar) {
 		return new Vec2d(x*scalar, y*scalar);
+	}
+
+	public Vec2d flip() {
+		return new Vec2d(-x, -y);
 	}
 
 	@Override

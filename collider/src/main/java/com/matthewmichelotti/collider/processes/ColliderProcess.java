@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.matthewmichelotti.collider.util;
+package com.matthewmichelotti.collider.processes;
 
 import com.matthewmichelotti.collider.Collider;
 import com.matthewmichelotti.collider.ColliderEvent;
 
 /**
- * A ContProcess implementation wrapped around a Collider.
- *
- * @author Matthew Michelotti
+ * A FlowProcess implementation wrapped around a Collider.
  */
-public class ColliderProcess implements ContProcess {
+public class ColliderProcess implements FlowProcess {
 	private Collider collider;
 	private ColliderListener listener;
 
@@ -40,18 +38,18 @@ public class ColliderProcess implements ContProcess {
 	}
 
 	@Override
-	public double peekNextEventTime() {
+	public double peekNextTime() {
 		return collider.peekNextEventTime();
 	}
 
 	@Override
-	public void stepToTime(double time) {
+	public void advance(double time) {
 		ColliderEvent evt = collider.advance(time, false);
 		if(evt != null) throw new RuntimeException();
 	}
 
 	@Override
-	public void resolveEvent() {
+	public void resolveNext() {
 		double time = collider.getTime();
 		ColliderEvent evt = collider.advance(time);
 		if(evt != null) {

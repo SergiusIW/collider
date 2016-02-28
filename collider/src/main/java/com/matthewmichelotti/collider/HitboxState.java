@@ -96,15 +96,15 @@ public final class HitboxState implements Cloneable {
 	}
 
 	/**
-	 * Set the group that this HitBox belongs to.
+	 * Set the group that this Hitbox belongs to.
 	 * Default group is 0.
-	 * The value -1 denotes that this HitBox does not belong to any group
+	 * The value -1 denotes that this Hitbox does not belong to any group
 	 * and thus is never tested for collisions.
 	 * This method will also invoke the functionality of
 	 * {@link #interactivityChange()}.
 	 * <p>
 	 * Collision testing will only be performed on HitBoxes of the groups
-	 * specified by the {@link InteractTester#getInteractGroups(HitBox)}
+	 * specified by the {@link InteractTester#getInteractGroups(Hitbox)}
 	 * method.
 	 * This reduces the number of HitBoxes to iterate over for collision checks.
 	 * It is a good idea to use only a small number of groups for a game, perhaps 1 to 3.
@@ -112,7 +112,7 @@ public final class HitboxState implements Cloneable {
 	 * <a href="http://en.wikipedia.org/wiki/Shoot_'em_up#Bullet_hell_and_niche_appeal">danmaku</a>
 	 * game, you might use one group for bullets and one group for everything else,
 	 * and make it so bullets do not check for collisions within the bullet group.
-	 * @param group Group that this HitBox should belong to.
+	 * @param group Group that this Hitbox should belong to.
 	 */
 	public void setGroup(int group) {
 		this.group = group;
@@ -121,8 +121,8 @@ public final class HitboxState implements Cloneable {
 
 	/**
 	 * Call this method if there is a change in the return values
-	 * of {@link InteractTester#canInteract(HitBox, HitBox)} involving
-	 * the HitBox.
+	 * of {@link InteractTester#canInteract(Hitbox, Hitbox)} involving
+	 * the Hitbox.
 	 * This will prompt searching for potential collisions between
 	 * previously uninteractable HitBoxes.
 	 * Separate events will not be generated for HitBoxes that overlap and used
@@ -156,7 +156,7 @@ public final class HitboxState implements Cloneable {
 	}
 
 	HitboxState advance(double originalTime, double newTime, boolean allowRemainingTimeOverflow) {
-		if(originalTime == newTime) return this;
+		if(originalTime == newTime) return clone();
 		if(originalTime > newTime) throw new IllegalArgumentException();
 		HitboxState newState = this.clone();
 		double delta = newTime - originalTime;
