@@ -6,20 +6,12 @@ detection](http://en.wikipedia.org/wiki/Collision_detection#A_posteriori_.28disc
 which basically means that the time of the collision is determined very 
 precisely as opposed to using a time-stepping method.
 
-### Looking Forward
+### On Hiatus
 
-It's been a couple of years now (August 2015) since I wrote this library.
-I like the simple public API that collider currently has, so that is unlikely to change too much.
-There are a few plans I have for changes in the future:
-* Better examples
-* Maven integration
-* Removing any object pooling from the public api, or at least making it an experimental option
-* Possibly adding support for arbitrary polygons as opposed to just axis-aligned rectangles and circles, although I probably won't do this unless I have a use case for it
-* Possibly a [Rust](https://www.rust-lang.org/) port of the library, as I am very interested in this new programming language
-* Using builder pattern to configure Collider settings
-* Improve ease of use for moving a hitbox in a non-linear path
-
-Collider *is not and will never be* a physics engine library.  It is meant for continuous collision detection only.  In principle someone could develop a physics engine on top of Collider, although a piece of advice: for many 2-D games a realistic physics engine is not helpful.  I suppose I should define what I mean by a physics engine just to be clear: a physics engine is a software library for simulating (at least) rigid body dynamics where the bodies have finite mass.  A physics engine must compute and apply the correct normal forces on these bodies based on where they contact each other.
+The Java Collider project is on hiatus.
+I have shifted my focus to the [Rust](https://www.rust-lang.org/) programming language,
+so I have ported Collider to Rust.
+That project is more up-to-date, and you can find it at https://github.com/SergiusIW/collider-rs.
 
 ###Download 
 
