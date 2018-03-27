@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Original Code" pattern="file[core]:src//*||file[demos-core]:src//*||file[demos-desktop]:src//*" />
+</component>

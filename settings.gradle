@@ -1,0 +1,5 @@
+rootProject.name = 'collider'
+include 'core'
+include 'demos-core'
+include 'demos-desktop'
+
