@@ -1,4 +1,4 @@
-#Collider 
+# Collider 
 
 Collider is a Java library for efficient and precise 2-D collision 
 detection with a simple interface. Collider uses [continuous collision 
@@ -13,24 +13,24 @@ I have shifted my focus to the [Rust](https://www.rust-lang.org/) programming la
 so I have ported Collider to Rust.
 That project is more up-to-date, and you can find it at https://github.com/SergiusIW/collider-rs.
 
-###Download 
+### Download 
 
 Release builds of Collider are available at
 https://github.com/SergiusIW/collider/releases.
 At some point in the future I will start uploading release builds to Maven Central.
 
-###Documentation 
+### Documentation 
 
 Javadocs for Collider come with the distribution that you download. The 
 Javadocs for the latest release may be read online at
 http://www.matthewmichelotti.com/projects/collider/api/.
 
-###Source Code
+### Source Code
 
 This project is open-source and available on GitHub.
 You can find the source code at https://github.com/SergiusIW/collider.
 
-###Demos 
+### Demos 
 
 There is currently no tutorial for using the Collider library. Along 
 with reading the javadocs, you can learn how to use Collider by studying 
@@ -40,7 +40,7 @@ demos can be found in two modules in the [github
 repository](https://github.com/SergiusIW/collider), demos-core
 and demos-desktop.
 
-###Dependencies
+### Dependencies
 
 The Collider library does not depend on any third party libraries.
 However, the Collider demos depend on [LibGDX](http://libgdx.badlogicgames.com/).
