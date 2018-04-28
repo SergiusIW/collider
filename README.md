@@ -51,9 +51,3 @@ See the build.gradle files for more details.
 
 Collider is licensed under the [Apache 2.0 
 License](http://www.apache.org/licenses/LICENSE-2.0.html). 
-
-### Games using Collider
-
-Currently, the only game that uses Collider is a free (closed-source) game I made named [Weaponless](http://www.matthewmichelotti.com/games/weaponless/).
-Check it out at http://www.matthewmichelotti.com/games/weaponless/.
-If you do make a project that uses Collider, I'd be happy to hear about it.
